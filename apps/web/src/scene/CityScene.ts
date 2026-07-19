@@ -65,6 +65,7 @@ export class CityScene {
   private readonly edgeObjects = new Map<string, Mesh>();
   private readonly tokenObjects = new Map<string, Object3D>();
   private readonly resizeObserver: ResizeObserver;
+  private selectedId: string | null = null;
 
   constructor(private readonly container: HTMLElement) {
     this.scene.background = null;
@@ -90,6 +91,29 @@ export class CityScene {
     this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.container);
+  }
+
+  get canvas(): HTMLCanvasElement {
+    return this.renderer.domElement;
+  }
+
+  get pickCamera(): PerspectiveCamera {
+    return this.camera;
+  }
+
+  getPickableObjects(): Object3D[] {
+    return [...this.nodeObjects.values(), ...this.edgeObjects.values()];
+  }
+
+  setSelection(selection: { id: string } | null): void {
+    const nextSelectedId = selection?.id ?? null;
+    if (nextSelectedId === this.selectedId) return;
+
+    const previousSelectedId = this.selectedId;
+    this.selectedId = nextSelectedId;
+
+    if (previousSelectedId) this.applyHighlight(previousSelectedId, false);
+    if (this.selectedId) this.applyHighlight(this.selectedId, true);
   }
 
   sync(snapshot: FrameSnapshot): void {
@@ -144,6 +168,10 @@ export class CityScene {
       if (!object.parent) this.scene.add(object);
       object.position.copy(position);
       object.rotation.set(0, 0, token.state === "stranded" ? Math.PI / 2 : 0);
+    }
+
+    if (this.selectedId) {
+      this.applyHighlight(this.selectedId, true);
     }
   }
 
@@ -403,9 +431,41 @@ export class CityScene {
   private removeObject<T extends Object3D>(objects: Map<string, T>, id: string): void {
     const object = objects.get(id);
     if (!object) return;
+    if (id === this.selectedId) this.applyHighlight(id, false);
     object.removeFromParent();
     this.disposeObject(object);
     objects.delete(id);
+  }
+
+  private applyHighlight(id: string, active: boolean): void {
+    const object = this.nodeObjects.get(id) ?? this.edgeObjects.get(id);
+    if (!object) return;
+
+    object.traverse((child) => {
+      if (!(child instanceof Mesh)) return;
+      const materials = Array.isArray(child.material)
+        ? child.material
+        : [child.material];
+      for (const material of materials) {
+        if (!(material instanceof MeshStandardMaterial)) continue;
+        if (active) {
+          material.emissive.set(0xffa047);
+          material.emissiveIntensity = 0.28;
+          continue;
+        }
+
+        const baseEmissive = material.userData.baseEmissive;
+        if (baseEmissive instanceof Color) {
+          material.emissive.copy(baseEmissive);
+        } else {
+          material.emissive.set(0x000000);
+        }
+        material.emissiveIntensity =
+          typeof material.userData.baseEmissiveIntensity === "number"
+            ? material.userData.baseEmissiveIntensity
+            : 1;
+      }
+    });
   }
 
   private disposeObject(object: Object3D): void {
@@ -478,6 +538,8 @@ function createMaterial(color: number): MeshStandardMaterial {
     metalness: 0.04,
   });
   material.userData.baseColor = material.color.clone();
+  material.userData.baseEmissive = material.emissive.clone();
+  material.userData.baseEmissiveIntensity = material.emissiveIntensity;
   return material;
 }
 
