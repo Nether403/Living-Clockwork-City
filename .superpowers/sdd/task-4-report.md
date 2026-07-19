@@ -75,4 +75,35 @@ Result: passed.
 - Scope follows Task 4 only; no Simulation class added.
 - Market dispatch intentionally does not require power per MVP brief.
 - Home labor dispatch requires `!starving`; power is not required per binding decision.
-- Existing token model has no travel direction field, so roads are still effectively advanced using each edge's `from -> to` orientation from Task 3.
+
+## Review fixes: headingTo and unpowered bakery
+
+- Added `Token.headingTo` so moving tokens arrive at the intended endpoint on undirected road paths.
+- `dispatch` and queued-token forwarding now set `headingTo` from the current source node to the opposite endpoint of the selected road edge.
+- `advanceTokens` now delivers or queues at `token.headingTo`, allowing reverse traversal of stored edge orientation.
+- Tightened the unpowered bakery economy test by seeding bakery food while disconnected from power and asserting no token is ever destined for `market`.
+
+Command:
+
+```bash
+npm run test -w @lcc/sim
+```
+
+Result:
+
+```text
+> @lcc/sim@0.1.0 test
+> vitest run
+
+ RUN  v3.2.7 /workspace/packages/sim
+
+ ✓ tests/graph.test.ts (4 tests) 3ms
+ ✓ tests/tokens.test.ts (8 tests) 4ms
+ ✓ tests/economy.test.ts (2 tests) 10ms
+ ✓ tests/types-smoke.test.ts (1 test) 1ms
+
+ Test Files  4 passed (4)
+      Tests  15 passed (15)
+   Start at  23:27:10
+   Duration  328ms (transform 96ms, setup 0ms, collect 166ms, tests 18ms, environment 0ms, prepare 222ms)
+```

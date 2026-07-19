@@ -13,6 +13,7 @@ function stateWithMovingToken(): SimState {
     resource: "food",
     state: "moving",
     at: "r1",
+    headingTo: "bakery",
     progress: 0,
     destination: "bakery",
   };
@@ -69,6 +70,18 @@ describe("advanceTokens", () => {
     expect(state.tokens.t1.state).toBe("moving");
     expect(state.tokens.t1.progress).toBeCloseTo(0.75);
     advanceTokens(state);
+    expect(state.tokens.t1.state).toBe("delivered");
+    expect(state.tokens.t1.at).toBe("bakery");
+    expect(state.nodes.bakery.stock.food).toBe(1);
+  });
+
+  it("delivers when traveling opposite the stored edge orientation", () => {
+    const state = stateWithMovingToken();
+    state.edges.r1.from = "bakery";
+    state.edges.r1.to = "farm";
+
+    for (let i = 0; i < 4; i++) advanceTokens(state);
+
     expect(state.tokens.t1.state).toBe("delivered");
     expect(state.tokens.t1.at).toBe("bakery");
     expect(state.nodes.bakery.stock.food).toBe(1);

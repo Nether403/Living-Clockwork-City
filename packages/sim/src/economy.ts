@@ -43,6 +43,8 @@ export function dispatch(state: SimState): void {
 
     const path = pathToNearest(state, node.id, plan.targetKind);
     if (!path) continue;
+    const headingTo = otherEndpoint(state, path[0], node.id);
+    if (!headingTo) continue;
     if (!canEnterEdge(state, path[0])) continue;
 
     const id = `t${state.nextTokenId++}`;
@@ -51,6 +53,7 @@ export function dispatch(state: SimState): void {
       resource: plan.resource,
       state: "moving",
       at: path[0],
+      headingTo,
       progress: 0,
       destination: path.destination,
     };
@@ -110,9 +113,16 @@ function forwardQueuedTokens(state: SimState, outboundNodes: Set<string>): void 
       continue;
     }
     if (!canEnterEdge(state, path[0])) continue;
+    const headingTo = otherEndpoint(state, path[0], from);
+    if (!headingTo) {
+      token.state = "stranded";
+      token.progress = 0;
+      continue;
+    }
 
     token.state = "moving";
     token.at = path[0];
+    token.headingTo = headingTo;
     token.progress = 0;
     outboundNodes.add(from);
   }
@@ -176,4 +186,16 @@ function pathToNearest(
 function canEnterEdge(state: SimState, edgeId: string): boolean {
   const edge = state.edges[edgeId];
   return !!edge && countTokensOnEdge(state, edgeId) < edge.capacity;
+}
+
+function otherEndpoint(
+  state: SimState,
+  edgeId: string,
+  fromNodeId: string,
+): string | null {
+  const edge = state.edges[edgeId];
+  if (!edge) return null;
+  if (edge.from === fromNodeId) return edge.to;
+  if (edge.to === fromNodeId) return edge.from;
+  return null;
 }

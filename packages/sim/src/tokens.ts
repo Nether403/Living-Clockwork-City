@@ -45,7 +45,7 @@ export function advanceTokens(state: SimState): void {
     const step = 1 / Math.max(1, edge.traversalTicks);
     token.progress += step;
     if (token.progress >= 1) {
-      const arrivedAt = edge.to;
+      const arrivedAt = token.headingTo;
       if (arrivedAt === token.destination) {
         deliverFinal(state, token, arrivedAt);
       } else {

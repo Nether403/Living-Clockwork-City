@@ -143,11 +143,14 @@ describe("economy chain", () => {
     expect(state.nodes.home.starving).toBe(false);
   });
 
-  it("stops bakery production when unpowered", () => {
+  it("does not dispatch bakery food to market when unpowered", () => {
     const state = buildMiniChain();
     delete state.edges.power_bakery;
     updatePowerFlags(state);
+    state.nodes.bakery.stock.food = 10;
+    state.nodes.home.stock.food = 1;
     const before = Object.keys(state.tokens).length;
+
     for (let i = 0; i < 20; i++) {
       produce(state);
       dispatch(state);
@@ -155,8 +158,12 @@ describe("economy chain", () => {
       consume(state);
       state.tick++;
     }
+
     expect(state.nodes.bakery.powered).toBe(false);
-    expect(state.nodes.home.starving).toBe(true);
     expect(Object.keys(state.tokens).length).toBeGreaterThanOrEqual(before);
+    expect(
+      Object.values(state.tokens).some((token) => token.destination === "market"),
+    ).toBe(false);
+    expect(state.nodes.home.starving).toBe(true);
   });
 });

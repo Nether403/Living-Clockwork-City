@@ -49,6 +49,8 @@ export interface Token {
   state: TokenState;
   /** Node id when queued/stranded/delivered; edge id when moving */
   at: string;
+  /** Node id this token will arrive at when it completes the current edge */
+  headingTo: string;
   /** 0..1 progress along edge when moving */
   progress: number;
   destination: string;
