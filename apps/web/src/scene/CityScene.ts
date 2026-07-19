@@ -381,7 +381,6 @@ export class CityScene {
         break;
     }
 
-    stampPickData(group, token.id, "token");
     return group;
   }
 
