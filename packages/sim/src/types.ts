@@ -59,6 +59,7 @@ export interface Token {
 export interface DemolishedRecord {
   kind: "node" | "edge";
   id: string;
+  batchId?: string;
   /** Serialized original so restore can put it back */
   payload: SimNode | SimEdge;
 }
