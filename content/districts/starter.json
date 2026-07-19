@@ -1,0 +1,286 @@
+{
+  "id": "starter",
+  "name": "Starter District",
+  "nodes": [
+    {
+      "id": "farm_a",
+      "kind": "farm",
+      "name": "Wheat Farm",
+      "x": -8,
+      "z": 2,
+      "capacity": { "food": 12, "energy": 0, "labor": 0 },
+      "stock": { "food": 6, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "bakery_a",
+      "kind": "bakery",
+      "name": "River Bakery",
+      "x": -4,
+      "z": 1,
+      "capacity": { "food": 8, "energy": 0, "labor": 0 },
+      "stock": { "food": 3, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "market_a",
+      "kind": "market",
+      "name": "Clock Market",
+      "x": -1,
+      "z": 0,
+      "capacity": { "food": 8, "energy": 0, "labor": 0 },
+      "stock": { "food": 3, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "home_west",
+      "kind": "home",
+      "name": "West Row Homes",
+      "x": -1,
+      "z": -3,
+      "capacity": { "food": 8, "energy": 0, "labor": 0 },
+      "stock": { "food": 5, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "home_east",
+      "kind": "home",
+      "name": "East Bank Homes",
+      "x": 6,
+      "z": -2,
+      "capacity": { "food": 16, "energy": 0, "labor": 6 },
+      "stock": { "food": 12, "energy": 0, "labor": 3 }
+    },
+    {
+      "id": "work_west",
+      "kind": "workplace",
+      "name": "West Foundry",
+      "x": 1,
+      "z": 3,
+      "capacity": { "food": 0, "energy": 0, "labor": 16 },
+      "stock": { "food": 0, "energy": 0, "labor": 3 }
+    },
+    {
+      "id": "work_east",
+      "kind": "workplace",
+      "name": "East Workshop",
+      "x": 10,
+      "z": 4,
+      "capacity": { "food": 0, "energy": 0, "labor": 16 },
+      "stock": { "food": 0, "energy": 0, "labor": 12 }
+    },
+    {
+      "id": "plant_a",
+      "kind": "power_plant",
+      "name": "Steam Plant",
+      "x": -6,
+      "z": 5,
+      "capacity": { "food": 0, "energy": 20, "labor": 0 },
+      "stock": { "food": 0, "energy": 20, "labor": 0 }
+    },
+    {
+      "id": "sub_a",
+      "kind": "substation",
+      "name": "West Substation",
+      "x": -3,
+      "z": 4,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "sub_b",
+      "kind": "substation",
+      "name": "East Substation",
+      "x": 7,
+      "z": 3,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "j_west_bridge",
+      "kind": "junction",
+      "name": "West Bridge Junction",
+      "x": 2,
+      "z": 0,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "j_east_bridge",
+      "kind": "junction",
+      "name": "East Bridge Junction",
+      "x": 5,
+      "z": 0,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "j_east_industry",
+      "kind": "junction",
+      "name": "East Industry Road",
+      "x": 7,
+      "z": 1,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    },
+    {
+      "id": "j_east_loop",
+      "kind": "junction",
+      "name": "East Loop",
+      "x": 9,
+      "z": 2,
+      "capacity": { "food": 0, "energy": 0, "labor": 0 },
+      "stock": { "food": 0, "energy": 0, "labor": 0 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "road_farm_bakery",
+      "from": "farm_a",
+      "to": "bakery_a",
+      "kind": "road",
+      "traversalTicks": 3,
+      "capacity": 2
+    },
+    {
+      "id": "road_bakery_market",
+      "from": "bakery_a",
+      "to": "market_a",
+      "kind": "road",
+      "traversalTicks": 3,
+      "capacity": 2
+    },
+    {
+      "id": "road_market_home_west",
+      "from": "market_a",
+      "to": "home_west",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "road_market_west_bridge",
+      "from": "market_a",
+      "to": "j_west_bridge",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 3
+    },
+    {
+      "id": "road_work_west",
+      "from": "j_west_bridge",
+      "to": "work_west",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "road_bridge",
+      "from": "j_west_bridge",
+      "to": "j_east_bridge",
+      "kind": "road",
+      "traversalTicks": 3,
+      "capacity": 2
+    },
+    {
+      "id": "road_east_bridge_home",
+      "from": "j_east_bridge",
+      "to": "home_east",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "road_east_bridge_industry",
+      "from": "j_east_bridge",
+      "to": "j_east_industry",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "road_east_industry_loop",
+      "from": "j_east_industry",
+      "to": "j_east_loop",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "road_east_loop_work",
+      "from": "j_east_loop",
+      "to": "work_east",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
+    },
+    {
+      "id": "power_plant_sub_a",
+      "from": "plant_a",
+      "to": "sub_a",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_farm",
+      "from": "sub_a",
+      "to": "farm_a",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_bakery",
+      "from": "sub_a",
+      "to": "bakery_a",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_market",
+      "from": "sub_a",
+      "to": "market_a",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_home_west",
+      "from": "sub_a",
+      "to": "home_west",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_work_west",
+      "from": "sub_a",
+      "to": "work_west",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_a_sub_b",
+      "from": "sub_a",
+      "to": "sub_b",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_b_home_east",
+      "from": "sub_b",
+      "to": "home_east",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    },
+    {
+      "id": "power_sub_b_work_east",
+      "from": "sub_b",
+      "to": "work_east",
+      "kind": "power",
+      "traversalTicks": 1,
+      "capacity": 99
+    }
+  ]
+}
