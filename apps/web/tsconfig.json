@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@lcc/sim": ["../../packages/sim/src/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}
