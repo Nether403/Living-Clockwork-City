@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lcc/sim": "workspace:*",
+    "@lcc/sim": "*",
     "@types/three": "^0.185.1",
     "three": "^0.185.1",
     "typescript": "^7.0.2",
