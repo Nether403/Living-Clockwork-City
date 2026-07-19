@@ -188,8 +188,8 @@ Monorepo via npm workspaces (lightweight; no Nx/Turborepo required in Phase 1).
 
 ## 10. Acceptance Checklist (Phase 1 Done)
 
-- [ ] `packages/sim` runs Vitest suite green with demolish scenario coverage
-- [ ] Browser demo loads starter district with moving food/energy/labor tokens
-- [ ] Player can demolish and restore road / bakery / power plant / bridge
-- [ ] Three authored demolish stories produce visually distinct cascades
-- [ ] README explains how to install, test, and run the demo
+- [x] `packages/sim` runs Vitest suite green with demolish scenario coverage
+- [x] Browser demo loads starter district with moving food/energy/labor tokens
+- [x] Player can demolish and restore road / bakery / power plant / bridge
+- [x] Three authored demolish stories produce visually distinct cascades
+- [x] README explains how to install, test, and run the demo
