@@ -1,0 +1,9 @@
+{
+  "scenarios": [
+    "idle_watch",
+    "starve_the_east",
+    "blackout",
+    "bridge_out",
+    "double_cut"
+  ]
+}

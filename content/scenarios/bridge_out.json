@@ -1,0 +1,20 @@
+{
+  "id": "bridge_out",
+  "title": "Bridge Out",
+  "blurb": "Remove the river bridge and watch west-side jobs wait for workers stranded across the water.",
+  "districtId": "starter",
+  "warmUpTicks": 8,
+  "autoDemolishId": "road_bridge",
+  "captions": [
+    {
+      "id": "idle_workers_work_west",
+      "when": {
+        "type": "node_flag",
+        "nodeId": "work_west",
+        "flag": "idle_workers",
+        "minIdle": 1
+      },
+      "text": "The West Foundry idles - the bridge was carrying east-bank labor to the west side."
+    }
+  ]
+}

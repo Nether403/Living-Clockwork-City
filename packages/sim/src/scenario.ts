@@ -20,6 +20,10 @@ export interface ScenarioDef {
   captions: CaptionRule[];
 }
 
+export interface ScenarioIndex {
+  scenarios: string[];
+}
+
 export interface CaptionRule {
   id: string;
   when: CaptionPredicate;
@@ -126,6 +130,29 @@ const scenarioSchema: z.ZodType<ScenarioDef> = z
 
 export function loadScenario(json: unknown): ScenarioDef {
   return scenarioSchema.parse(json);
+}
+
+const scenarioIndexSchema: z.ZodType<ScenarioIndex> = z
+  .object({
+    scenarios: z.array(z.string().min(1)),
+  })
+  .strict()
+  .superRefine((index, ctx) => {
+    const scenarioIds = new Set<string>();
+    for (const scenarioId of index.scenarios) {
+      if (scenarioIds.has(scenarioId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate scenario id: ${scenarioId}`,
+          path: ["scenarios"],
+        });
+      }
+      scenarioIds.add(scenarioId);
+    }
+  });
+
+export function loadScenarioIndex(json: unknown): ScenarioIndex {
+  return scenarioIndexSchema.parse(json);
 }
 
 export function createScenarioRuntime(def: ScenarioDef): ScenarioRuntimeState {

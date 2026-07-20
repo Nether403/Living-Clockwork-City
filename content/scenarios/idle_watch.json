@@ -1,0 +1,8 @@
+{
+  "id": "idle_watch",
+  "title": "Idle Watch",
+  "blurb": "Let the starter district run without intervention and watch the clockwork settle into rhythm.",
+  "districtId": "starter",
+  "warmUpTicks": 0,
+  "captions": []
+}

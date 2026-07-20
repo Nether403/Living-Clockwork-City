@@ -1,0 +1,20 @@
+{
+  "id": "blackout",
+  "title": "Blackout",
+  "blurb": "Drop the steam plant after a short watch and see the bakery darken as the food chain freezes.",
+  "districtId": "starter",
+  "warmUpTicks": 4,
+  "autoDemolishId": "plant_a",
+  "captions": [
+    {
+      "id": "node_unpowered_bakery_a",
+      "when": { "type": "node_unpowered", "nodeId": "bakery_a" },
+      "text": "The bakery went dark - without plant power, bread stops reaching the market."
+    },
+    {
+      "id": "demolished_plant_a",
+      "when": { "type": "demolished", "id": "plant_a" },
+      "text": "The steam plant is gone, and every powered shop downstream feels it."
+    }
+  ]
+}
