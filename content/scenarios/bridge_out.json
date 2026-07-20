@@ -3,6 +3,7 @@
   "title": "Bridge Out",
   "blurb": "Remove the river bridge and watch west-side jobs wait for workers stranded across the water.",
   "districtId": "starter",
+  "camera": { "x": 8, "y": 22, "z": 13, "targetX": 3.5, "targetZ": 1 },
   "warmUpTicks": 8,
   "autoDemolishId": "road_bridge",
   "captions": [

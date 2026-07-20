@@ -47,6 +47,15 @@ interface CameraPreset {
   targetZ: number;
 }
 
+interface CameraEaseState {
+  startedAtMs: number;
+  durationMs: number;
+  fromPosition: Vector3;
+  toPosition: Vector3;
+  fromTarget: Vector3;
+  toTarget: Vector3;
+}
+
 interface NodeStatus {
   powered: boolean;
   starving: boolean;
@@ -71,6 +80,7 @@ const EDGE_DIMENSIONS: Record<EdgeKind, { color: number; height: number; width: 
 const TOKEN_Y = 0.42;
 const UNPOWERED_MULTIPLIER = 0.35;
 const CASCADE_PULSE_DURATION_MS = 1_000;
+const CAMERA_PRESET_EASE_MS = 800;
 
 export class CityScene {
   private readonly scene = new Scene();
@@ -88,6 +98,7 @@ export class CityScene {
   private lastSnapshotTick: number | null = null;
   private selection: PickSelection | null = null;
   private selectedId: string | null = null;
+  private cameraEaseState: CameraEaseState | null = null;
 
   constructor(private readonly container: HTMLElement) {
     this.scene.background = null;
@@ -145,10 +156,14 @@ export class CityScene {
   }
 
   setCameraPreset(preset: CameraPreset): void {
-    this.camera.position.set(preset.x, preset.y, preset.z);
-    this.controls.target.set(preset.targetX, 0, preset.targetZ);
-    this.camera.lookAt(this.controls.target);
-    this.controls.update();
+    this.cameraEaseState = {
+      startedAtMs: performance.now(),
+      durationMs: CAMERA_PRESET_EASE_MS,
+      fromPosition: this.camera.position.clone(),
+      toPosition: new Vector3(preset.x, preset.y, preset.z),
+      fromTarget: this.controls.target.clone(),
+      toTarget: new Vector3(preset.targetX, 0, preset.targetZ),
+    };
   }
 
   sync(snapshot: FrameSnapshot): void {
@@ -216,6 +231,7 @@ export class CityScene {
   }
 
   render(): void {
+    this.updateCameraEase(performance.now());
     this.controls.update();
     this.updatePulseEmissives();
     this.renderer.render(this.scene, this.camera);
@@ -520,6 +536,35 @@ export class CityScene {
         this.nodePulseUntilMs.delete(id);
       }
       this.applyEmissiveState(id, now);
+    }
+  }
+
+  private updateCameraEase(nowMs: number): void {
+    if (!this.cameraEaseState) return;
+
+    const state = this.cameraEaseState;
+    const progress = MathUtils.clamp(
+      (nowMs - state.startedAtMs) / state.durationMs,
+      0,
+      1,
+    );
+    const easedProgress = MathUtils.smoothstep(progress, 0, 1);
+
+    this.camera.position.lerpVectors(
+      state.fromPosition,
+      state.toPosition,
+      easedProgress,
+    );
+    this.controls.target.lerpVectors(
+      state.fromTarget,
+      state.toTarget,
+      easedProgress,
+    );
+
+    if (progress >= 1) {
+      this.camera.position.copy(state.toPosition);
+      this.controls.target.copy(state.toTarget);
+      this.cameraEaseState = null;
     }
   }
 

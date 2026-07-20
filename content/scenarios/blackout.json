@@ -3,6 +3,7 @@
   "title": "Blackout",
   "blurb": "Drop the steam plant after a short watch and see the bakery darken as the food chain freezes.",
   "districtId": "starter",
+  "camera": { "x": 3, "y": 22, "z": 14, "targetX": -4.5, "targetZ": 3.5 },
   "warmUpTicks": 4,
   "autoDemolishId": "plant_a",
   "captions": [
