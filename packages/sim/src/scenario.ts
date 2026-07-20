@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Simulation } from "./simulation.js";
 import type { FrameSnapshot, SimNode } from "./types.js";
 
 export interface ScenarioDef {
@@ -23,6 +24,15 @@ export interface CaptionRule {
   id: string;
   when: CaptionPredicate;
   text: string;
+}
+
+export interface ScenarioRuntimeState {
+  def: ScenarioDef;
+  warmUpRemaining: number;
+  followUpRemaining: number | null;
+  firedCaptions: Set<string>;
+  autoDemolishDone: boolean;
+  followUpDone: boolean;
 }
 
 export type CaptionPredicate =
@@ -118,6 +128,53 @@ export function loadScenario(json: unknown): ScenarioDef {
   return scenarioSchema.parse(json);
 }
 
+export function createScenarioRuntime(def: ScenarioDef): ScenarioRuntimeState {
+  return {
+    def,
+    warmUpRemaining: def.warmUpTicks,
+    followUpRemaining: null,
+    firedCaptions: new Set(),
+    autoDemolishDone: false,
+    followUpDone: false,
+  };
+}
+
+export function advanceScenario(
+  state: ScenarioRuntimeState,
+  sim: Simulation,
+  snapshot: FrameSnapshot,
+): { captions: { id: string; text: string }[]; didDemolish: boolean } {
+  const captions = collectNewCaptions(state, snapshot);
+  let didDemolish = false;
+  const { def } = state;
+
+  if (!state.autoDemolishDone && def.autoDemolishId) {
+    if (state.warmUpRemaining > 0) {
+      state.warmUpRemaining -= 1;
+    } else {
+      const postDemolishSnapshot = sim.demolish(def.autoDemolishId);
+      state.autoDemolishDone = true;
+      didDemolish = true;
+      if (def.followUp) {
+        state.followUpRemaining = def.followUp.afterTicks;
+      }
+      captions.push(...collectNewCaptions(state, postDemolishSnapshot));
+    }
+  } else if (state.followUpRemaining !== null && !state.followUpDone) {
+    if (state.followUpRemaining > 0) {
+      state.followUpRemaining -= 1;
+    } else if (def.followUp) {
+      const postDemolishSnapshot = sim.demolish(def.followUp.demolishId);
+      state.followUpDone = true;
+      state.followUpRemaining = null;
+      didDemolish = true;
+      captions.push(...collectNewCaptions(state, postDemolishSnapshot));
+    }
+  }
+
+  return { captions, didDemolish };
+}
+
 export function evaluateCaptions(
   snapshot: FrameSnapshot,
   rules: readonly CaptionRule[],
@@ -128,6 +185,21 @@ export function evaluateCaptions(
       (rule) => !fired.has(rule.id) && matchesPredicate(snapshot, rule.when),
     )
     .map((rule) => ({ id: rule.id, text: rule.text }));
+}
+
+function collectNewCaptions(
+  state: ScenarioRuntimeState,
+  snapshot: FrameSnapshot,
+): { id: string; text: string }[] {
+  const captions = evaluateCaptions(
+    snapshot,
+    state.def.captions,
+    state.firedCaptions,
+  );
+  for (const caption of captions) {
+    state.firedCaptions.add(caption.id);
+  }
+  return captions;
 }
 
 function matchesPredicate(
