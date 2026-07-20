@@ -23,6 +23,10 @@ Phase 1 delivers a **headless discrete-token simulation** plus a **Three.js web 
 | [Product requirements](docs/prd/living-clockwork-city.md) | Vision, goals, loops, success criteria |
 | [Design spec (Phase 1)](docs/superpowers/specs/2026-07-19-living-clockwork-city-design.md) | Architecture, sim model, tech stack |
 | [Implementation plan (Phase 1)](docs/superpowers/plans/2026-07-19-living-clockwork-city-phase1.md) | Task-by-task build guide |
+| [Roadmap](ROADMAP.md) | Phases, finish lines |
+| [AGENTS.md](AGENTS.md) | Contributor / agent guidance |
+| [Phase 2 design](docs/superpowers/specs/2026-07-20-phase2-readability-design.md) | Readability & scenarios |
+| [Phase 2 plan](docs/superpowers/plans/2026-07-20-phase2-readability.md) | Task-by-task Phase 2 guide |
 
 ## Install
 
@@ -109,11 +113,6 @@ docs/superpowers/plans/    # Implementation plans
 
 Root scripts delegate to workspaces: `npm test` → `@lcc/sim`, `npm run dev` → `@lcc/web`.
 
-## Roadmap (phases 2–5)
+## Roadmap
 
-Phase 1 is the sim kernel + demolish demo. Later phases (not yet implemented):
-
-1. **Readability pack** — better cascade telegraphing, scenario presets menu, ghost flow arrows on hover.
-2. **Expanded loops** — water, waste, housing capacity, congestion.
-3. **Limited builder** — repair kits / place from a palette of five pieces.
-4. **Content pipeline** — district editor, balance HUD for designers.
+See [ROADMAP.md](ROADMAP.md). **Phase 2 (readability & scenarios) is in progress.** Finish lines: demo after Phase 2, game after Phase 4, crafted product after Phase 5.
