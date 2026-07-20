@@ -121,11 +121,11 @@ For `double_cut`, support optional `followUp?: { afterTicks: number; demolishId:
 
 ## 7. Acceptance checklist
 
-- [ ] Five scenarios loadable from `content/scenarios/`
-- [ ] Scenario menu can run each; city resets cleanly
-- [ ] Ghost arrows appear on node selection
-- [ ] Slow-mo 0.25× available
-- [ ] After-action captions fire for starve / blackout / bridge scenarios (tested in sim)
-- [ ] Inspect panel shows demolished payload details
-- [ ] `npm test` and `npm run build` green
-- [ ] README + ROADMAP updated for Phase 2 status
+- [x] Five scenarios loadable from `content/scenarios/`
+- [x] Scenario menu can run each; city resets cleanly
+- [x] Ghost arrows appear on node selection
+- [x] Slow-mo 0.25× available
+- [x] After-action captions fire for starve / blackout / bridge scenarios (tested in sim)
+- [x] Inspect panel shows demolished payload details
+- [x] `npm test` and `npm run build` green
+- [x] README + ROADMAP updated for Phase 2 status

@@ -20,9 +20,9 @@ Do **not** wait for procedural megacities, multiplayer, or freeform building. Th
 
 Headless discrete-token sim (food, energy, labor) + Three.js diorama. Demolish/restore one piece; three authored cascade stories on the starter district.
 
-### Phase 2 — Readability & scenario pack ← current
+### Phase 2 — Readability & scenario pack
 
-**Status:** In progress
+**Status:** Complete
 
 Make the toy *communicative*:
 
@@ -65,5 +65,5 @@ Palette of ~5–8 pieces (road, pipe, substation, depot, repair kit). Goal: stab
 
 - [Product requirements](docs/prd/living-clockwork-city.md)
 - [Phase 1 design](docs/superpowers/specs/2026-07-19-living-clockwork-city-design.md)
-- [Phase 2 design](docs/superpowers/specs/2026-07-20-phase2-readability-design.md) (when present)
+- [Phase 2 design](docs/superpowers/specs/2026-07-20-phase2-readability-design.md)
 - [AGENTS.md](AGENTS.md) — guidance for AI/human contributors
