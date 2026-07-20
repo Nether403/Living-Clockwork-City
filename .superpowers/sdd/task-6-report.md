@@ -1,4 +1,4 @@
-# Task 6 Report: District loader + starter map
+# Task 6 Report: Ghost flow arrows + cascade pulse
 
 ## Status
 
@@ -6,21 +6,17 @@ Complete.
 
 ## Changes
 
-- Added `loadDistrict(json: unknown): SimState` with strict Zod validation for authored district content.
-- Exported the loader from `packages/sim/src/index.ts`.
-- Authored `content/districts/starter.json` with required ids and three demolish stories:
-  - `road_farm_bakery` is the farm's only road into the food chain.
-  - `plant_a` powers `bakery_a` and workplaces through `sub_a`/`sub_b`.
-  - `road_bridge` is the only road crossing needed for `home_east` labor to reach `work_west`.
-- Added loader, invariant, and scenario tests in `packages/sim/tests/loadDistrict.test.ts`.
+- Added `apps/web/src/scene/FlowArrows.ts` to draw muted amber ghost arrows for selected node outbound routes and selected-edge highlights.
+- Wired `FlowArrows` into `CityScene` selection/snapshot sync so arrows clear on null selection and refresh as the graph changes.
+- Added `CityScene` cascade pulses for nodes newly becoming starving or unpowered, fading emissive over about one second.
+- Cleared scene selection/arrows explicitly when running a scenario reset.
 
 ## Verification
 
-- `npm run test -w @lcc/sim`
-- `npm run build -w @lcc/sim`
+- `npm run build -w @lcc/web`
 
-Both passed.
+Passed. Vite emitted the existing large chunk warning.
 
 ## Concerns
 
-- The current economy dispatches to the nearest target kind, so the starter map intentionally makes `home_west` non-labor-producing and `work_east` farther from `home_east` than `work_west` to keep the bridge story deterministic.
+- Edge selection uses a bright single arrow rather than an animated strip.

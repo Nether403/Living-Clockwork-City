@@ -23,6 +23,10 @@ Phase 1 delivers a **headless discrete-token simulation** plus a **Three.js web 
 | [Product requirements](docs/prd/living-clockwork-city.md) | Vision, goals, loops, success criteria |
 | [Design spec (Phase 1)](docs/superpowers/specs/2026-07-19-living-clockwork-city-design.md) | Architecture, sim model, tech stack |
 | [Implementation plan (Phase 1)](docs/superpowers/plans/2026-07-19-living-clockwork-city-phase1.md) | Task-by-task build guide |
+| [Roadmap](ROADMAP.md) | Phases, finish lines |
+| [AGENTS.md](AGENTS.md) | Contributor / agent guidance |
+| [Phase 2 design](docs/superpowers/specs/2026-07-20-phase2-readability-design.md) | Readability & scenarios |
+| [Phase 2 plan](docs/superpowers/plans/2026-07-20-phase2-readability.md) | Task-by-task Phase 2 guide |
 
 ## Install
 
@@ -65,8 +69,8 @@ Open the URL Vite prints (default `http://localhost:5173/`). Drag to orbit the d
 | Click | Select node or edge |
 | Drag | Orbit camera |
 | **Space** | Pause / resume simulation |
-| **[** | Slower (0.5× → 1× → 2×) |
-| **]** | Faster (0.5× → 1× → 2×) |
+| **[** | Slower, down to slow-mo 0.25× (0.25× → 0.5× → 1× → 2×) |
+| **]** | Faster from slow-mo 0.25× (0.25× → 0.5× → 1× → 2×) |
 
 Build production assets:
 
@@ -80,21 +84,29 @@ Preview the production build:
 npm run preview -w @lcc/web
 ```
 
-## Demolish scenarios to try
+## Phase 2 scenarios
 
-The starter district encodes three authored “what if” stories. Select the target, click **Demolish**, watch the cascade, then **Restore** to put it back.
+The starter district includes five authored Phase 2 “what if” scenarios. Use the **Scenarios** dock to run each one; the city resets cleanly, frames the scene, and auto-demolishes the target where the scenario calls for it.
 
-### 1. Cut the farm road — `road_farm_bakery`
+### 1. Idle Watch — `idle_watch`
 
-Select the road between the farm and bakery. After demolition, bread crates stop moving; the bakery starves, markets empty, and homes eventually go hungry. Workers may still commute until food buffers run out.
+Let the starter district run without intervention and watch the clockwork settle into rhythm.
 
-### 2. Demolish the power plant — `plant_a`
+### 2. Starve the East — `starve_the_east`
 
-Select the power plant node. Substations go dark, the bakery stops producing (even though roads remain), and the food chain freezes from lack of power.
+Cuts `road_farm_bakery`. Bread crates stop moving; the bakery starves, markets empty, and homes eventually go hungry. Workers may still commute until food buffers run out.
 
-### 3. Remove the river bridge — `road_bridge`
+### 3. Blackout — `blackout`
 
-Select the bridge road edge. One residential cluster loses access to workplaces on the other side — idle workers pile up on one bank while opposite workplaces sit empty.
+Demolishes `plant_a`. Substations go dark, the bakery stops producing even though roads remain, and the food chain freezes from lack of power.
+
+### 4. Bridge Out — `bridge_out`
+
+Removes `road_bridge`. One residential cluster loses access to workplaces on the other side; idle workers pile up on one bank while opposite workplaces sit empty.
+
+### 5. Double Cut — `double_cut`
+
+First severs `road_farm_bakery`, then knocks out `plant_a` to compound a food shortage with a power failure.
 
 ## Repo layout
 
@@ -109,11 +121,6 @@ docs/superpowers/plans/    # Implementation plans
 
 Root scripts delegate to workspaces: `npm test` → `@lcc/sim`, `npm run dev` → `@lcc/web`.
 
-## Roadmap (phases 2–5)
+## Roadmap
 
-Phase 1 is the sim kernel + demolish demo. Later phases (not yet implemented):
-
-1. **Readability pack** — better cascade telegraphing, scenario presets menu, ghost flow arrows on hover.
-2. **Expanded loops** — water, waste, housing capacity, congestion.
-3. **Limited builder** — repair kits / place from a palette of five pieces.
-4. **Content pipeline** — district editor, balance HUD for designers.
+See [ROADMAP.md](ROADMAP.md) for phase status and [AGENTS.md](AGENTS.md) for contributor / agent guidance. **Phase 2 (readability & scenarios) is complete.** Finish lines: demo after Phase 2, game after Phase 4, crafted product after Phase 5.

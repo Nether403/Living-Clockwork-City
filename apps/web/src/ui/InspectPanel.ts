@@ -1,4 +1,10 @@
-import type { FrameSnapshot, SimEdge, SimNode, StockPile } from "@lcc/sim";
+import type {
+  DemolishedSnapshotRecord,
+  FrameSnapshot,
+  SimEdge,
+  SimNode,
+  StockPile,
+} from "@lcc/sim";
 import type { PickSelection } from "../input/Picker";
 
 interface InspectPanelOptions {
@@ -9,6 +15,7 @@ interface InspectPanelOptions {
 
 interface SelectionState {
   demolished: boolean;
+  demolishedRecord: DemolishedSnapshotRecord | undefined;
   edge: SimEdge | undefined;
   node: SimNode | undefined;
   selection: PickSelection;
@@ -97,9 +104,13 @@ function resolveSelectionState(
 ): SelectionState {
   const node = snapshot.nodes.find((candidate) => candidate.id === selection.id);
   const edge = snapshot.edges.find((candidate) => candidate.id === selection.id);
+  const demolishedRecord = resolveDemolishedRecord(snapshot, selection.id);
 
   return {
-    demolished: snapshot.demolishedIds.includes(selection.id),
+    demolished:
+      snapshot.demolishedIds.includes(selection.id) ||
+      demolishedRecord !== undefined,
+    demolishedRecord,
     edge,
     node,
     selection,
@@ -107,12 +118,18 @@ function resolveSelectionState(
 }
 
 function selectionName(state: SelectionState): string {
-  return state.node?.name ?? state.edge?.id ?? state.selection.id;
+  return (
+    state.node?.name ??
+    state.demolishedRecord?.name ??
+    state.edge?.id ??
+    state.selection.id
+  );
 }
 
 function selectionMeta(state: SelectionState): string {
   const objectKind = state.selection.kind === "node" ? "Node" : "Edge";
-  const simKind = state.node?.kind ?? state.edge?.kind;
+  const simKind =
+    state.node?.kind ?? state.edge?.kind ?? state.demolishedRecord?.payloadKind;
   return simKind ? `${objectKind} - ${formatKind(simKind)}` : objectKind;
 }
 
@@ -137,11 +154,27 @@ function detailRows(
       detailRow("To", state.edge.to),
       detailRow("Capacity", String(state.edge.capacity)),
     );
+  } else if (state.demolishedRecord) {
+    rows.push(
+      detailRow("Name", state.demolishedRecord.name),
+      detailRow("Kind", formatKind(state.demolishedRecord.payloadKind)),
+      detailRow("Payload", formatKind(state.demolishedRecord.kind)),
+    );
   } else {
     rows.push(detailRow("Stock", "Unavailable"));
   }
 
   return rows;
+}
+
+function resolveDemolishedRecord(
+  snapshot: FrameSnapshot,
+  selectionId: string,
+): DemolishedSnapshotRecord | undefined {
+  return (
+    snapshot.demolished.find((record) => record.id === selectionId) ??
+    snapshot.demolished.find((record) => record.batchId === selectionId)
+  );
 }
 
 function detailRow(label: string, value: string): HTMLElement {

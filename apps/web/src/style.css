@@ -32,6 +32,105 @@ canvas {
   outline: none;
 }
 
+.scenario-menu {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  width: min(18rem, calc(100vw - 2rem));
+  padding: 0.7rem;
+  color: #2d261c;
+  background: rgba(239, 224, 193, 0.64);
+  border: 1px solid rgba(86, 65, 38, 0.16);
+  border-radius: 0.9rem;
+  box-shadow: 0 0.8rem 2rem rgba(55, 42, 27, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.scenario-menu__heading {
+  margin: 0 0 0.45rem 0.25rem;
+  color: rgba(45, 38, 28, 0.58);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.scenario-menu__list {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.scenario-menu__item {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  color: #2f2417;
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  cursor: pointer;
+}
+
+.scenario-menu__item:hover {
+  background: rgba(255, 245, 220, 0.42);
+  border-color: rgba(86, 65, 38, 0.12);
+}
+
+.scenario-menu__item--active {
+  background: rgba(255, 245, 220, 0.62);
+  border-color: rgba(86, 65, 38, 0.24);
+}
+
+.scenario-menu__title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.scenario-menu__blurb {
+  overflow: hidden;
+  color: rgba(45, 38, 28, 0.66);
+  font-size: 0.74rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caption-banner {
+  position: fixed;
+  right: 50%;
+  bottom: 1.15rem;
+  z-index: 11;
+  max-width: min(44rem, calc(100vw - 2rem));
+  padding: 0.7rem 1rem;
+  color: #2f2417;
+  background: rgba(255, 245, 220, 0.76);
+  border: 1px solid rgba(86, 65, 38, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 0.8rem 2rem rgba(55, 42, 27, 0.14);
+  transform: translateX(50%);
+  backdrop-filter: blur(10px);
+}
+
+.caption-banner[hidden] {
+  display: none;
+}
+
+.caption-banner__text {
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(0.88rem, 1.8vw, 1rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .inspect-panel {
   position: fixed;
   top: 1rem;
@@ -130,10 +229,27 @@ canvas {
 }
 
 @media (max-width: 680px) {
+  .scenario-menu {
+    top: 0.75rem;
+    left: 0.75rem;
+    width: min(16rem, calc(100vw - 1.5rem));
+    padding: 0.55rem;
+  }
+
+  .scenario-menu__blurb {
+    display: none;
+  }
+
+  .caption-banner {
+    bottom: 0.75rem;
+    max-width: calc(100vw - 1.5rem);
+    padding: 0.65rem 0.85rem;
+  }
+
   .inspect-panel {
     top: auto;
     right: 0.75rem;
-    bottom: 0.75rem;
+    bottom: 4.25rem;
     left: 0.75rem;
     width: auto;
     border-radius: 1rem 1rem 1.25rem 1.25rem;

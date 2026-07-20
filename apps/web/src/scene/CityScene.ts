@@ -28,6 +28,8 @@ import type {
   SimNode,
   Token,
 } from "@lcc/sim";
+import type { PickSelection } from "../input/Picker";
+import { FlowArrows } from "./FlowArrows";
 
 type SimKind = "node" | "edge" | "token";
 
@@ -35,6 +37,28 @@ interface NodeStyle {
   color: number;
   footprint: [number, number];
   height: number;
+}
+
+interface CameraPreset {
+  x: number;
+  y: number;
+  z: number;
+  targetX: number;
+  targetZ: number;
+}
+
+interface CameraEaseState {
+  startedAtMs: number;
+  durationMs: number;
+  fromPosition: Vector3;
+  toPosition: Vector3;
+  fromTarget: Vector3;
+  toTarget: Vector3;
+}
+
+interface NodeStatus {
+  powered: boolean;
+  starving: boolean;
 }
 
 const NODE_STYLES: Record<NodeKind, NodeStyle> = {
@@ -55,6 +79,8 @@ const EDGE_DIMENSIONS: Record<EdgeKind, { color: number; height: number; width: 
 
 const TOKEN_Y = 0.42;
 const UNPOWERED_MULTIPLIER = 0.35;
+const CASCADE_PULSE_DURATION_MS = 1_000;
+const CAMERA_PRESET_EASE_MS = 800;
 
 export class CityScene {
   private readonly scene = new Scene();
@@ -64,8 +90,15 @@ export class CityScene {
   private readonly nodeObjects = new Map<string, Object3D>();
   private readonly edgeObjects = new Map<string, Mesh>();
   private readonly tokenObjects = new Map<string, Object3D>();
+  private readonly flowArrows = new FlowArrows();
   private readonly resizeObserver: ResizeObserver;
+  private readonly nodePulseUntilMs = new Map<string, number>();
+  private previousNodeStatuses = new Map<string, NodeStatus>();
+  private latestSnapshot: FrameSnapshot | null = null;
+  private lastSnapshotTick: number | null = null;
+  private selection: PickSelection | null = null;
   private selectedId: string | null = null;
+  private cameraEaseState: CameraEaseState | null = null;
 
   constructor(private readonly container: HTMLElement) {
     this.scene.background = null;
@@ -88,6 +121,7 @@ export class CityScene {
     this.controls.maxDistance = 36;
 
     this.addEnvironment();
+    this.scene.add(this.flowArrows.group);
     this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.container);
@@ -105,18 +139,37 @@ export class CityScene {
     return [...this.nodeObjects.values(), ...this.edgeObjects.values()];
   }
 
-  setSelection(selection: { id: string } | null): void {
-    const nextSelectedId = selection?.id ?? null;
-    if (nextSelectedId === this.selectedId) return;
+  setSelection(selection: PickSelection | null): void {
+    if (sameSelection(this.selection, selection)) {
+      this.syncFlowArrows();
+      return;
+    }
 
+    const nextSelectedId = selection?.id ?? null;
     const previousSelectedId = this.selectedId;
+    this.selection = selection;
     this.selectedId = nextSelectedId;
 
-    if (previousSelectedId) this.applyHighlight(previousSelectedId, false);
-    if (this.selectedId) this.applyHighlight(this.selectedId, true);
+    if (previousSelectedId) this.applyEmissiveState(previousSelectedId);
+    if (this.selectedId) this.applyEmissiveState(this.selectedId);
+    this.syncFlowArrows();
+  }
+
+  setCameraPreset(preset: CameraPreset): void {
+    this.cameraEaseState = {
+      startedAtMs: performance.now(),
+      durationMs: CAMERA_PRESET_EASE_MS,
+      fromPosition: this.camera.position.clone(),
+      toPosition: new Vector3(preset.x, preset.y, preset.z),
+      fromTarget: this.controls.target.clone(),
+      toTarget: new Vector3(preset.targetX, 0, preset.targetZ),
+    };
   }
 
   sync(snapshot: FrameSnapshot): void {
+    this.latestSnapshot = snapshot;
+    this.updateCascadePulses(snapshot);
+
     const demolishedIds = new Set(snapshot.demolishedIds);
     const nodesById = new Map(snapshot.nodes.map((node) => [node.id, node]));
     const edgesById = new Map(snapshot.edges.map((edge) => [edge.id, edge]));
@@ -153,6 +206,7 @@ export class CityScene {
       if (!object.parent) this.scene.add(object);
       object.position.set(node.x, 0, node.z);
       this.updateNodePower(object, node.powered);
+      this.applyEmissiveState(node.id);
     }
 
     for (const token of snapshot.tokens) {
@@ -171,12 +225,15 @@ export class CityScene {
     }
 
     if (this.selectedId) {
-      this.applyHighlight(this.selectedId, true);
+      this.applyEmissiveState(this.selectedId);
     }
+    this.syncFlowArrows();
   }
 
   render(): void {
+    this.updateCameraEase(performance.now());
     this.controls.update();
+    this.updatePulseEmissives();
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -184,6 +241,7 @@ export class CityScene {
     this.resizeObserver.disconnect();
     this.controls.dispose();
     this.renderer.domElement.remove();
+    this.flowArrows.dispose();
     this.disposeObject(this.scene);
     this.renderer.dispose();
   }
@@ -430,15 +488,97 @@ export class CityScene {
   private removeObject<T extends Object3D>(objects: Map<string, T>, id: string): void {
     const object = objects.get(id);
     if (!object) return;
-    if (id === this.selectedId) this.applyHighlight(id, false);
+    this.nodePulseUntilMs.delete(id);
+    if (id === this.selectedId) this.applyEmissiveState(id);
     object.removeFromParent();
     this.disposeObject(object);
     objects.delete(id);
   }
 
-  private applyHighlight(id: string, active: boolean): void {
+  private syncFlowArrows(): void {
+    if (!this.latestSnapshot) return;
+    this.flowArrows.sync(this.latestSnapshot, this.selection);
+  }
+
+  private updateCascadePulses(snapshot: FrameSnapshot): void {
+    const now = performance.now();
+    const shouldCompare =
+      this.previousNodeStatuses.size > 0 &&
+      (this.lastSnapshotTick === null || snapshot.tick >= this.lastSnapshotTick);
+    const nextStatuses = new Map<string, NodeStatus>();
+
+    for (const node of snapshot.nodes) {
+      const previous = this.previousNodeStatuses.get(node.id);
+      if (
+        shouldCompare &&
+        previous &&
+        ((!previous.starving && node.starving) ||
+          (previous.powered && !node.powered))
+      ) {
+        this.nodePulseUntilMs.set(node.id, now + CASCADE_PULSE_DURATION_MS);
+      }
+      nextStatuses.set(node.id, {
+        powered: node.powered,
+        starving: node.starving,
+      });
+    }
+
+    this.previousNodeStatuses = nextStatuses;
+    this.lastSnapshotTick = snapshot.tick;
+  }
+
+  private updatePulseEmissives(): void {
+    if (this.nodePulseUntilMs.size === 0) return;
+
+    const now = performance.now();
+    for (const [id, pulseUntilMs] of [...this.nodePulseUntilMs]) {
+      if (pulseUntilMs <= now) {
+        this.nodePulseUntilMs.delete(id);
+      }
+      this.applyEmissiveState(id, now);
+    }
+  }
+
+  private updateCameraEase(nowMs: number): void {
+    if (!this.cameraEaseState) return;
+
+    const state = this.cameraEaseState;
+    const progress = MathUtils.clamp(
+      (nowMs - state.startedAtMs) / state.durationMs,
+      0,
+      1,
+    );
+    const easedProgress = MathUtils.smoothstep(progress, 0, 1);
+
+    this.camera.position.lerpVectors(
+      state.fromPosition,
+      state.toPosition,
+      easedProgress,
+    );
+    this.controls.target.lerpVectors(
+      state.fromTarget,
+      state.toTarget,
+      easedProgress,
+    );
+
+    if (progress >= 1) {
+      this.camera.position.copy(state.toPosition);
+      this.controls.target.copy(state.toTarget);
+      this.cameraEaseState = null;
+    }
+  }
+
+  private applyEmissiveState(id: string, now = performance.now()): void {
     const object = this.nodeObjects.get(id) ?? this.edgeObjects.get(id);
     if (!object) return;
+
+    const isSelected = id === this.selectedId;
+    const pulseUntilMs = this.nodePulseUntilMs.get(id) ?? 0;
+    const pulseRemaining = MathUtils.clamp(
+      (pulseUntilMs - now) / CASCADE_PULSE_DURATION_MS,
+      0,
+      1,
+    );
 
     object.traverse((child) => {
       if (!(child instanceof Mesh)) return;
@@ -447,22 +587,23 @@ export class CityScene {
         : [child.material];
       for (const material of materials) {
         if (!(material instanceof MeshStandardMaterial)) continue;
-        if (active) {
+
+        if (pulseRemaining > 0) {
+          material.emissive.set(isSelected ? 0xffb35b : 0xffd36a);
+          material.emissiveIntensity = Math.max(
+            isSelected ? 0.28 : 0,
+            0.18 + pulseRemaining * 0.72,
+          );
+          continue;
+        }
+
+        if (isSelected) {
           material.emissive.set(0xffa047);
           material.emissiveIntensity = 0.28;
           continue;
         }
 
-        const baseEmissive = material.userData.baseEmissive;
-        if (baseEmissive instanceof Color) {
-          material.emissive.copy(baseEmissive);
-        } else {
-          material.emissive.set(0x000000);
-        }
-        material.emissiveIntensity =
-          typeof material.userData.baseEmissiveIntensity === "number"
-            ? material.userData.baseEmissiveIntensity
-            : 1;
+        restoreBaseEmissive(material);
       }
     });
   }
@@ -540,6 +681,26 @@ function createMaterial(color: number): MeshStandardMaterial {
   material.userData.baseEmissive = material.emissive.clone();
   material.userData.baseEmissiveIntensity = material.emissiveIntensity;
   return material;
+}
+
+function restoreBaseEmissive(material: MeshStandardMaterial): void {
+  const baseEmissive = material.userData.baseEmissive;
+  if (baseEmissive instanceof Color) {
+    material.emissive.copy(baseEmissive);
+  } else {
+    material.emissive.set(0x000000);
+  }
+  material.emissiveIntensity =
+    typeof material.userData.baseEmissiveIntensity === "number"
+      ? material.userData.baseEmissiveIntensity
+      : 1;
+}
+
+function sameSelection(
+  a: PickSelection | null,
+  b: PickSelection | null,
+): boolean {
+  return a?.id === b?.id && a?.kind === b?.kind;
 }
 
 function stampPickData(object: Object3D, simId: string, simKind: SimKind): void {

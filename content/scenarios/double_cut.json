@@ -1,0 +1,22 @@
+{
+  "id": "double_cut",
+  "title": "Double Cut",
+  "blurb": "First sever food from the farm, then knock out power to compound the cascade.",
+  "districtId": "starter",
+  "camera": { "x": 3, "y": 24, "z": 15, "targetX": -5, "targetZ": 3 },
+  "warmUpTicks": 8,
+  "autoDemolishId": "road_farm_bakery",
+  "followUp": { "afterTicks": 20, "demolishId": "plant_a" },
+  "captions": [
+    {
+      "id": "any_home_starving",
+      "when": { "type": "any_home_starving" },
+      "text": "Food runs dry after the farm road is cut; hungry homes show the first failure."
+    },
+    {
+      "id": "node_unpowered_bakery_a",
+      "when": { "type": "node_unpowered", "nodeId": "bakery_a" },
+      "text": "Then the bakery goes dark, turning a supply cut into a full food-chain freeze."
+    }
+  ]
+}

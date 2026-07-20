@@ -1,0 +1,16 @@
+{
+  "id": "starve_the_east",
+  "title": "Starve the East",
+  "blurb": "Cut the farm road and watch food stop moving through the market to the east bank homes.",
+  "districtId": "starter",
+  "camera": { "x": 2, "y": 22, "z": 14, "targetX": -4, "targetZ": 1 },
+  "warmUpTicks": 8,
+  "autoDemolishId": "road_farm_bakery",
+  "captions": [
+    {
+      "id": "any_home_starving",
+      "when": { "type": "any_home_starving" },
+      "text": "The east bank went hungry - the farm road was the only supply path."
+    }
+  ]
+}
