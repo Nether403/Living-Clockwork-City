@@ -1,4 +1,11 @@
-import type { FrameSnapshot, ScenarioDef, Simulation } from "@lcc/sim";
+import {
+  advanceScenario,
+  createScenarioRuntime,
+  type FrameSnapshot,
+  type ScenarioDef,
+  type ScenarioRuntimeState,
+  type Simulation,
+} from "@lcc/sim";
 import { Picker, type PickSelection } from "./input/Picker";
 import { CityScene } from "./scene/CityScene";
 import { CaptionBanner } from "./ui/CaptionBanner";
@@ -7,7 +14,7 @@ import { ScenarioMenu } from "./ui/ScenarioMenu";
 
 const TICK_MS = 250;
 const MAX_FRAME_DT_MS = 1_000;
-const SPEEDS = [0.5, 1, 2] as const;
+const SPEEDS = [0.25, 0.5, 1, 2] as const;
 type SpeedMultiplier = (typeof SPEEDS)[number];
 
 export class GameApp {
@@ -20,15 +27,22 @@ export class GameApp {
   private lastFrameTime = 0;
   private accumulatorMs = 0;
   private snapshot: FrameSnapshot;
+  private simulation: Simulation;
+  private readonly scenariosById: ReadonlyMap<string, ScenarioDef>;
+  private scenarioRuntime: ScenarioRuntimeState | null = null;
   private selected: PickSelection | null = null;
   private paused = false;
   private speed: SpeedMultiplier = 1;
 
   constructor(
     container: HTMLElement,
-    private readonly simulation: Simulation,
+    private readonly createSim: () => Simulation,
     scenarios: ScenarioDef[],
   ) {
+    this.simulation = createSim();
+    this.scenariosById = new Map(
+      scenarios.map((scenario) => [scenario.id, scenario]),
+    );
     this.cityScene = new CityScene(container);
     this.inspectPanel = new InspectPanel({
       container,
@@ -47,7 +61,7 @@ export class GameApp {
       getPickables: () => this.cityScene.getPickableObjects(),
       onPick: this.select,
     });
-    this.snapshot = simulation.snapshot();
+    this.snapshot = this.simulation.snapshot();
     this.syncSnapshot(this.snapshot);
     window.addEventListener("keydown", this.onKeyDown);
   }
@@ -91,6 +105,19 @@ export class GameApp {
     let stepped = false;
     while (this.accumulatorMs >= TICK_MS) {
       this.snapshot = this.simulation.tick();
+      if (this.scenarioRuntime) {
+        const result = advanceScenario(
+          this.scenarioRuntime,
+          this.simulation,
+          this.snapshot,
+        );
+        for (const caption of result.captions) {
+          this.captionBanner.show(caption.text);
+        }
+        if (result.didDemolish) {
+          this.snapshot = this.simulation.snapshot();
+        }
+      }
       this.accumulatorMs -= TICK_MS;
       stepped = true;
     }
@@ -114,13 +141,22 @@ export class GameApp {
   };
 
   readonly runScenario = (scenarioId: string): void => {
+    const scenario = this.scenariosById.get(scenarioId);
+    if (!scenario) {
+      console.warn(`Unknown scenario: ${scenarioId}`);
+      return;
+    }
+
     this.accumulatorMs = 0;
+    this.simulation = this.createSim();
+    this.scenarioRuntime = createScenarioRuntime(scenario);
     this.selected = null;
     this.captionBanner.clear();
-    this.scenarioMenu.setActive(scenarioId);
-    this.cityScene.setSelection(null);
-    this.inspectPanel.render(this.snapshot, null);
-    console.log(`Scenario run requested: ${scenarioId}`);
+    this.scenarioMenu.setActive(scenario.id);
+    this.syncSnapshot(this.simulation.snapshot());
+    if (scenario.camera) {
+      this.cityScene.setCameraPreset(scenario.camera);
+    }
   };
 
   private readonly restoreSelection = (id: string): void => {

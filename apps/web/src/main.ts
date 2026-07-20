@@ -16,8 +16,8 @@ import starveTheEastJson from "../../../content/scenarios/starve_the_east.json";
 import { GameApp } from "./GameApp";
 
 const container = document.querySelector<HTMLElement>("#app") ?? document.body;
-const state = loadDistrict(starterJson);
-const simulation = new Simulation(state);
+const createSimulation = (): Simulation =>
+  new Simulation(loadDistrict(starterJson));
 const scenarioIndex = loadScenarioIndex(scenariosIndexJson);
 const scenarioDefsById = {
   blackout: loadScenario(blackoutJson),
@@ -33,7 +33,7 @@ const scenarios = scenarioIndex.scenarios.map((id) => {
   }
   return scenario;
 });
-const app = new GameApp(container, simulation, scenarios);
+const app = new GameApp(container, createSimulation, scenarios);
 
 app.start();
 

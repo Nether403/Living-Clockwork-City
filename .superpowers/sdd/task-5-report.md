@@ -1,25 +1,28 @@
-# Task 5 Report: Simulation facade
+# Task 5 Report: GameApp scenario run loop + slow-mo
 
 ## Status
 
-Complete.
+Implemented.
 
-## Implemented
+## Changes
 
-- Added `Simulation` facade with `tick`, `demolish`, `restore`, `snapshot`, `getState`, and `fromMiniChain`.
-- Added demolition batching via optional `DemolishedRecord.batchId`.
-- Exported `Simulation` from `@lcc/sim`.
-- Added tests for:
-  - Demolishing the plant darkens the bakery.
-  - Restoring the plant brings power back.
-  - Demolishing a road edge strands an in-flight token.
+- Changed GameApp speed steps to `0.25x / 0.5x / 1x / 2x`.
+- Updated README controls to document the new slow-mo step.
+- Changed `main.ts` to pass a starter-district `Simulation` factory into `GameApp`.
+- Wired `GameApp.runScenario(id)` to:
+  - Find the loaded scenario definition.
+  - Recreate the simulation from `starter.json`.
+  - Create scenario runtime state, clear captions, reset selection, activate the menu item, sync the snapshot, and apply scenario camera presets.
+- Advanced active scenarios after successful simulation ticks.
+  - Queues returned captions through `CaptionBanner.show`.
+  - Refreshes snapshots after scheduled demolitions.
+- Added `CityScene.setCameraPreset`.
 
 ## Verification
 
-- `npm run test -w @lcc/sim`
-- `npm run build -w @lcc/sim`
-
-Both passed.
+- `npm run build -w @lcc/web` passed.
+  - Vite emitted the existing large chunk warning; build succeeded.
+- `npm test` passed.
 
 ## Concerns
 

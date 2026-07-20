@@ -37,6 +37,14 @@ interface NodeStyle {
   height: number;
 }
 
+interface CameraPreset {
+  x: number;
+  y: number;
+  z: number;
+  targetX: number;
+  targetZ: number;
+}
+
 const NODE_STYLES: Record<NodeKind, NodeStyle> = {
   home: { color: 0xc8915a, footprint: [0.9, 0.8], height: 0.55 },
   farm: { color: 0x7f9f55, footprint: [1.35, 1.05], height: 0.16 },
@@ -114,6 +122,13 @@ export class CityScene {
 
     if (previousSelectedId) this.applyHighlight(previousSelectedId, false);
     if (this.selectedId) this.applyHighlight(this.selectedId, true);
+  }
+
+  setCameraPreset(preset: CameraPreset): void {
+    this.camera.position.set(preset.x, preset.y, preset.z);
+    this.controls.target.set(preset.targetX, 0, preset.targetZ);
+    this.camera.lookAt(this.controls.target);
+    this.controls.update();
   }
 
   sync(snapshot: FrameSnapshot): void {

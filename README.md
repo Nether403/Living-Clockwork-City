@@ -69,8 +69,8 @@ Open the URL Vite prints (default `http://localhost:5173/`). Drag to orbit the d
 | Click | Select node or edge |
 | Drag | Orbit camera |
 | **Space** | Pause / resume simulation |
-| **[** | Slower (0.5× → 1× → 2×) |
-| **]** | Faster (0.5× → 1× → 2×) |
+| **[** | Slower (0.25× → 0.5× → 1× → 2×) |
+| **]** | Faster (0.25× → 0.5× → 1× → 2×) |
 
 Build production assets:
 
