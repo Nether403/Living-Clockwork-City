@@ -151,6 +151,7 @@ export class GameApp {
     this.simulation = this.createSim();
     this.scenarioRuntime = createScenarioRuntime(scenario);
     this.selected = null;
+    this.cityScene.setSelection(null);
     this.captionBanner.clear();
     this.scenarioMenu.setActive(scenario.id);
     this.syncSnapshot(this.simulation.snapshot());
