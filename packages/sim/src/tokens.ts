@@ -70,7 +70,13 @@ function deliverFinal(state: SimState, token: Token, nodeId: string): void {
 }
 
 function addStock(
-  stock: { food: number; energy: number; labor: number },
+  stock: {
+    food: number;
+    energy: number;
+    labor: number;
+    water: number;
+    waste: number;
+  },
   resource: ResourceKind,
   amount: number,
 ): void {

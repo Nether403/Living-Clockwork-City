@@ -1,4 +1,4 @@
-export type ResourceKind = "food" | "energy" | "labor";
+export type ResourceKind = "food" | "energy" | "labor" | "water" | "waste";
 
 export type NodeKind =
   | "home"
@@ -8,9 +8,11 @@ export type NodeKind =
   | "workplace"
   | "power_plant"
   | "substation"
-  | "junction";
+  | "junction"
+  | "reservoir"
+  | "dump";
 
-export type EdgeKind = "road" | "power";
+export type EdgeKind = "road" | "power" | "pipe";
 
 export type TokenState = "moving" | "queued" | "delivered" | "stranded";
 
@@ -18,6 +20,8 @@ export interface StockPile {
   food: number;
   energy: number;
   labor: number;
+  water: number;
+  waste: number;
 }
 
 export interface SimNode {
@@ -31,6 +35,8 @@ export interface SimNode {
   powered: boolean;
   operational: boolean;
   starving: boolean;
+  thirsty: boolean;
+  clogged: boolean;
   idleWorkers: number;
 }
 

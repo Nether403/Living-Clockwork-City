@@ -3,7 +3,7 @@ import { getPowerReachable, shortestRoadPath } from "../src/graph";
 import type { SimState } from "../src/types";
 
 function emptyStock() {
-  return { food: 0, energy: 0, labor: 0 };
+  return { food: 0, energy: 0, labor: 0, water: 0, waste: 0 };
 }
 
 function baseState(): SimState {
@@ -24,6 +24,8 @@ function baseState(): SimState {
         powered: true,
         operational: true,
         starving: false,
+        thirsty: false,
+        clogged: false,
         idleWorkers: 0,
       },
       sub: {
@@ -37,6 +39,8 @@ function baseState(): SimState {
         powered: false,
         operational: true,
         starving: false,
+        thirsty: false,
+        clogged: false,
         idleWorkers: 0,
       },
       bakery: {
@@ -50,6 +54,8 @@ function baseState(): SimState {
         powered: false,
         operational: true,
         starving: false,
+        thirsty: false,
+        clogged: false,
         idleWorkers: 0,
       },
       farm: {
@@ -63,6 +69,8 @@ function baseState(): SimState {
         powered: false,
         operational: true,
         starving: false,
+        thirsty: false,
+        clogged: false,
         idleWorkers: 0,
       },
     },

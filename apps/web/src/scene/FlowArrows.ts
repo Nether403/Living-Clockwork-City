@@ -9,6 +9,7 @@ import {
   Vector3,
 } from "three";
 import {
+  shortestPipePath,
   shortestRoadPath,
   type FrameSnapshot,
   type NodeKind,
@@ -23,10 +24,12 @@ const ROUTE_TARGETS: Partial<Record<NodeKind, NodeKind>> = {
   bakery: "market",
   market: "home",
   home: "workplace",
+  reservoir: "bakery",
 };
 
 const ARROW_Y = 0.34;
 const POWER_ARROW_Y = 0.48;
+const PIPE_ARROW_Y = 0.4;
 const EDGE_HIGHLIGHT_Y = 0.5;
 const UP = new Vector3(0, 1, 0);
 
@@ -82,7 +85,12 @@ export class FlowArrows {
     if (!targetKind) return;
 
     const state = snapshotToState(snapshot);
-    const path = nearestPathToKind(state, node.id, targetKind);
+    const path = nearestPathToKind(
+      state,
+      node.id,
+      targetKind,
+      node.kind === "reservoir" ? "pipe" : "road",
+    );
     if (!path) return;
 
     let fromNodeId = node.id;
@@ -123,7 +131,9 @@ export class FlowArrows {
       ? EDGE_HIGHLIGHT_Y
       : edge.kind === "power"
         ? POWER_ARROW_Y
-        : ARROW_Y;
+        : edge.kind === "pipe"
+          ? PIPE_ARROW_Y
+          : ARROW_Y;
     const start = new Vector3(from.x, y, from.z);
     const end = new Vector3(to.x, y, to.z);
     const delta = end.clone().sub(start);
@@ -171,15 +181,17 @@ function nearestPathToKind(
   state: SimState,
   fromNodeId: string,
   targetKind: NodeKind,
+  edgeKind: "road" | "pipe" = "road",
 ): string[] | null {
   let best: { destination: string; edges: string[] } | null = null;
+  const findPath = edgeKind === "pipe" ? shortestPipePath : shortestRoadPath;
 
   const candidates = Object.values(state.nodes)
     .filter((node) => node.kind === targetKind && node.id !== fromNodeId)
     .sort((a, b) => a.id.localeCompare(b.id));
 
   for (const candidate of candidates) {
-    const edges = shortestRoadPath(state, fromNodeId, candidate.id);
+    const edges = findPath(state, fromNodeId, candidate.id);
     if (!edges || edges.length === 0) continue;
     if (
       !best ||

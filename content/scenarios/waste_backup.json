@@ -1,0 +1,37 @@
+{
+  "id": "waste_backup",
+  "title": "Waste Backup",
+  "blurb": "Block the dump road — bins overflow and workers stay home.",
+  "districtId": "starter",
+  "camera": {
+    "x": 8,
+    "y": 12,
+    "z": 9,
+    "targetX": 7,
+    "targetZ": -2
+  },
+  "warmUpTicks": 10,
+  "autoDemolishId": "road_home_east_dump",
+  "captions": [
+    {
+      "id": "east_dump_cut",
+      "when": { "type": "demolished", "id": "road_home_east_dump" },
+      "text": "Dump access is cut — bins start to stack at the homes."
+    },
+    {
+      "id": "homes_clogged",
+      "when": { "type": "any_home_clogged" },
+      "text": "Homes clog with waste. Labor stops leaving until the dump road returns."
+    },
+    {
+      "id": "east_work_idle",
+      "when": {
+        "type": "node_flag",
+        "nodeId": "work_east",
+        "flag": "idle_workers",
+        "minIdle": 1
+      },
+      "text": "East Workshop idles — clogged homes will not send workers."
+    }
+  ]
+}

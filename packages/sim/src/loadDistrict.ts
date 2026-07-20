@@ -6,6 +6,8 @@ const stockSchema = z
     food: z.number().int().nonnegative(),
     energy: z.number().int().nonnegative(),
     labor: z.number().int().nonnegative(),
+    water: z.number().int().nonnegative(),
+    waste: z.number().int().nonnegative(),
   })
   .strict();
 
@@ -18,9 +20,11 @@ const nodeKindSchema = z.enum([
   "power_plant",
   "substation",
   "junction",
+  "reservoir",
+  "dump",
 ]);
 
-const edgeKindSchema = z.enum(["road", "power"]);
+const edgeKindSchema = z.enum(["road", "power", "pipe"]);
 
 const nodeSchema = z
   .object({
@@ -124,6 +128,8 @@ function toSimNode(node: DistrictNodeContent): SimNode {
     powered: false,
     operational: true,
     starving: false,
+    thirsty: false,
+    clogged: false,
     idleWorkers: 0,
   };
 }
@@ -136,5 +142,11 @@ function toSimEdge(edge: DistrictEdgeContent): SimEdge {
 }
 
 function toStock(stock: StockPile): StockPile {
-  return { food: stock.food, energy: stock.energy, labor: stock.labor };
+  return {
+    food: stock.food,
+    energy: stock.energy,
+    labor: stock.labor,
+    water: stock.water,
+    waste: stock.waste,
+  };
 }

@@ -1,16 +1,31 @@
-import { getPowerReachable, shortestRoadPath } from "./graph.js";
+import {
+  getPowerReachable,
+  shortestPipePath,
+  shortestRoadPath,
+} from "./graph.js";
 import { countTokensOnEdge } from "./tokens.js";
-import type { NodeKind, ResourceKind, SimNode, SimState, Token } from "./types.js";
+import type {
+  EdgeKind,
+  NodeKind,
+  ResourceKind,
+  SimNode,
+  SimState,
+  Token,
+} from "./types.js";
 
 type DispatchPlan = {
   resource: ResourceKind;
-  targetKind: NodeKind;
+  targetKinds: NodeKind[];
+  edgeKind: "road" | "pipe";
+  consumeWater?: boolean;
 };
 
 export function updatePowerFlags(state: SimState): void {
   const powered = getPowerReachable(state);
   for (const node of Object.values(state.nodes)) {
     if (node.kind === "power_plant" && node.operational) {
+      node.powered = true;
+    } else if (node.kind === "reservoir" || node.kind === "dump") {
       node.powered = true;
     } else {
       node.powered = powered.has(node.id);
@@ -20,10 +35,15 @@ export function updatePowerFlags(state: SimState): void {
 
 export function produce(state: SimState): void {
   for (const node of Object.values(state.nodes)) {
-    if (!node.operational || !node.powered) continue;
-    if (node.kind === "farm" && state.tick % 4 === 0) {
+    if (!node.operational) continue;
+    if (node.kind === "farm" && node.powered && state.tick % 4 === 0) {
       if (node.stock.food < node.capacity.food) {
         node.stock.food += 1;
+      }
+    }
+    if (node.kind === "reservoir" && state.tick % 4 === 0) {
+      if (node.stock.water < node.capacity.water) {
+        node.stock.water += 1;
       }
     }
   }
@@ -40,8 +60,9 @@ export function dispatch(state: SimState): void {
     const plan = dispatchPlanFor(node);
     if (!plan) continue;
     if (node.stock[plan.resource] < 1) continue;
+    if (plan.consumeWater && node.stock.water < 1) continue;
 
-    const path = pathToNearest(state, node.id, plan.targetKind);
+    const path = pathToNearest(state, node.id, plan.targetKinds, plan.edgeKind);
     if (!path) continue;
     const headingTo = otherEndpoint(state, path[0], node.id);
     if (!headingTo) continue;
@@ -58,6 +79,9 @@ export function dispatch(state: SimState): void {
       destination: path.destination,
     };
     node.stock[plan.resource] -= 1;
+    if (plan.consumeWater) {
+      node.stock.water -= 1;
+    }
     outboundNodes.add(node.id);
   }
 }
@@ -68,9 +92,37 @@ export function consume(state: SimState): void {
       if (node.stock.food > 0) {
         node.stock.food -= 1;
         node.starving = false;
+        if (node.stock.waste < node.capacity.waste) {
+          node.stock.waste += 1;
+        }
       } else {
         node.starving = true;
       }
+
+      if (node.capacity.water > 0) {
+        if (node.stock.water > 0) {
+          node.stock.water -= 1;
+          node.thirsty = false;
+        } else {
+          node.thirsty = true;
+        }
+      } else {
+        node.thirsty = false;
+      }
+    }
+
+    if (node.kind === "bakery") {
+      node.thirsty =
+        node.operational && node.powered && node.stock.water < 1;
+    }
+
+    if (node.kind === "home") {
+      node.clogged =
+        node.capacity.waste > 0 && node.stock.waste >= node.capacity.waste;
+    }
+
+    if (node.kind === "dump" && node.stock.waste > 0) {
+      node.stock.waste -= 1;
     }
 
     if (node.kind === "workplace") {
@@ -89,6 +141,7 @@ function regenerateHomeLabor(state: SimState): void {
       node.kind === "home" &&
       node.operational &&
       !node.starving &&
+      !node.clogged &&
       node.stock.labor < node.capacity.labor
     ) {
       node.stock.labor += 1;
@@ -106,7 +159,7 @@ function forwardQueuedTokens(state: SimState, outboundNodes: Set<string>): void 
       continue;
     }
 
-    const path = shortestRoadPath(state, from, token.destination);
+    const path = pathForToken(state, from, token);
     if (!path || path.length === 0) {
       token.state = "stranded";
       token.progress = 0;
@@ -128,6 +181,17 @@ function forwardQueuedTokens(state: SimState, outboundNodes: Set<string>): void 
   }
 }
 
+function pathForToken(
+  state: SimState,
+  from: string,
+  token: Token,
+): string[] | null {
+  if (token.resource === "water") {
+    return shortestPipePath(state, from, token.destination);
+  }
+  return shortestRoadPath(state, from, token.destination);
+}
+
 function sortedQueuedTokens(state: SimState): Token[] {
   return Object.values(state.tokens)
     .filter((token) => token.state === "queued")
@@ -144,15 +208,49 @@ function dispatchPlanFor(node: SimNode): DispatchPlan | null {
   switch (node.kind) {
     case "farm":
       if (!node.powered) return null;
-      return { resource: "food", targetKind: "bakery" };
+      return { resource: "food", targetKinds: ["bakery"], edgeKind: "road" };
     case "bakery":
       if (!node.powered) return null;
-      return { resource: "food", targetKind: "market" };
+      if (node.stock.water < 1) return null;
+      return {
+        resource: "food",
+        targetKinds: ["market"],
+        edgeKind: "road",
+        consumeWater: true,
+      };
     case "market":
-      return { resource: "food", targetKind: "home" };
-    case "home":
+      return { resource: "food", targetKinds: ["home"], edgeKind: "road" };
+    case "home": {
+      const wastePressure =
+        node.capacity.waste > 0 &&
+        node.stock.waste > Math.floor(node.capacity.waste / 2);
+      if (node.clogged || wastePressure) {
+        if (node.stock.waste < 1) return null;
+        return { resource: "waste", targetKinds: ["dump"], edgeKind: "road" };
+      }
+      if (!node.starving && node.stock.labor >= 1) {
+        return {
+          resource: "labor",
+          targetKinds: ["workplace"],
+          edgeKind: "road",
+        };
+      }
+      if (node.stock.waste > 0) {
+        return { resource: "waste", targetKinds: ["dump"], edgeKind: "road" };
+      }
       if (node.starving) return null;
-      return { resource: "labor", targetKind: "workplace" };
+      return {
+        resource: "labor",
+        targetKinds: ["workplace"],
+        edgeKind: "road",
+      };
+    }
+    case "reservoir":
+      return {
+        resource: "water",
+        targetKinds: ["bakery", "home"],
+        edgeKind: "pipe",
+      };
     default:
       return null;
   }
@@ -161,21 +259,41 @@ function dispatchPlanFor(node: SimNode): DispatchPlan | null {
 function pathToNearest(
   state: SimState,
   from: string,
-  targetKind: NodeKind,
+  targetKinds: NodeKind[],
+  edgeKind: Extract<EdgeKind, "road" | "pipe">,
 ): (string[] & { destination: string }) | null {
-  let best: { destination: string; edges: string[] } | null = null;
+  let best: { destination: string; edges: string[]; kindRank: number } | null =
+    null;
+  const findPath = edgeKind === "pipe" ? shortestPipePath : shortestRoadPath;
 
   for (const candidate of sortedNodes(state)) {
-    if (candidate.kind !== targetKind) continue;
-    const edges = shortestRoadPath(state, from, candidate.id);
+    const kindRank = targetKinds.indexOf(candidate.kind);
+    if (kindRank < 0) continue;
+    if (
+      edgeKind === "pipe" &&
+      candidate.stock.water >= candidate.capacity.water
+    ) {
+      continue;
+    }
+    if (
+      edgeKind === "road" &&
+      targetKinds.includes("dump") &&
+      candidate.kind === "dump" &&
+      candidate.stock.waste >= candidate.capacity.waste
+    ) {
+      continue;
+    }
+    const edges = findPath(state, from, candidate.id);
     if (!edges || edges.length === 0) continue;
     if (
       !best ||
       edges.length < best.edges.length ||
+      (edges.length === best.edges.length && kindRank < best.kindRank) ||
       (edges.length === best.edges.length &&
+        kindRank === best.kindRank &&
         candidate.id.localeCompare(best.destination) < 0)
     ) {
-      best = { destination: candidate.id, edges };
+      best = { destination: candidate.id, edges, kindRank };
     }
   }
 

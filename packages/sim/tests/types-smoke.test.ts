@@ -3,7 +3,7 @@ import type { StockPile } from "../src/types";
 
 describe("types", () => {
   it("allows empty stock piles", () => {
-    const stock: StockPile = { food: 0, energy: 0, labor: 0 };
+    const stock: StockPile = { food: 0, energy: 0, labor: 0, water: 0, waste: 0 };
     expect(stock.food).toBe(0);
   });
 });

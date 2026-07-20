@@ -148,6 +148,15 @@ function detailRows(
       detailRow("Stock", formatStock(state.node.stock)),
       detailRow("Queued", String(queueCount(snapshot, state.node.id))),
     );
+    if (state.node.thirsty) {
+      rows.push(detailRow("Thirsty", "Yes"));
+    }
+    if (state.node.clogged) {
+      rows.push(detailRow("Clogged", "Yes"));
+    }
+    if (state.node.starving) {
+      rows.push(detailRow("Starving", "Yes"));
+    }
   } else if (state.edge) {
     rows.push(
       detailRow("From", state.edge.from),
@@ -192,7 +201,7 @@ function detailRow(label: string, value: string): HTMLElement {
 }
 
 function formatStock(stock: StockPile): string {
-  return `Food ${stock.food} - Energy ${stock.energy} - Labor ${stock.labor}`;
+  return `Food ${stock.food} · Water ${stock.water} · Waste ${stock.waste} · Labor ${stock.labor}`;
 }
 
 function formatKind(kind: string): string {

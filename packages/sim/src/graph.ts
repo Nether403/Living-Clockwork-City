@@ -8,6 +8,10 @@ function powerEdges(state: SimState): SimEdge[] {
   return Object.values(state.edges).filter((e) => e.kind === "power");
 }
 
+function pipeEdges(state: SimState): SimEdge[] {
+  return Object.values(state.edges).filter((e) => e.kind === "pipe");
+}
+
 /** Undirected adjacency for traversal (MVP roads/power are bidirectional). */
 function undirectedAdj(
   edges: SimEdge[],
@@ -54,8 +58,24 @@ export function shortestRoadPath(
   from: string,
   to: string,
 ): string[] | null {
+  return shortestPathOnEdges(roadEdges(state), from, to);
+}
+
+export function shortestPipePath(
+  state: SimState,
+  from: string,
+  to: string,
+): string[] | null {
+  return shortestPathOnEdges(pipeEdges(state), from, to);
+}
+
+function shortestPathOnEdges(
+  edges: SimEdge[],
+  from: string,
+  to: string,
+): string[] | null {
   if (from === to) return [];
-  const adj = undirectedAdj(roadEdges(state));
+  const adj = undirectedAdj(edges);
   const queue = [from];
   const prev = new Map<string, { node: string; edgeId: string }>();
   const seen = new Set<string>([from]);
@@ -66,14 +86,14 @@ export function shortestRoadPath(
       seen.add(n.other);
       prev.set(n.other, { node: cur, edgeId: n.edgeId });
       if (n.other === to) {
-        const edges: string[] = [];
+        const path: string[] = [];
         let walk: string | undefined = to;
         while (walk && walk !== from) {
           const p: { node: string; edgeId: string } = prev.get(walk)!;
-          edges.push(p.edgeId);
+          path.push(p.edgeId);
           walk = p.node;
         }
-        return edges.reverse();
+        return path.reverse();
       }
       queue.push(n.other);
     }

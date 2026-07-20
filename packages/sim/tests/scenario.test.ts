@@ -11,13 +11,13 @@ import { Simulation } from "../src/simulation";
 import type { FrameSnapshot, SimNode } from "../src/types";
 
 function stock() {
-  return { food: 0, energy: 0, labor: 0 };
+  return { food: 0, energy: 0, labor: 0, water: 0, waste: 0 };
 }
 
 function node(
   id: string,
   options: Partial<
-    Pick<SimNode, "kind" | "powered" | "starving" | "idleWorkers">
+    Pick<SimNode, "kind" | "powered" | "starving" | "idleWorkers" | "thirsty" | "clogged">
   > = {},
 ): SimNode {
   return {
@@ -31,6 +31,8 @@ function node(
     powered: options.powered ?? true,
     operational: true,
     starving: options.starving ?? false,
+    thirsty: options.thirsty ?? false,
+    clogged: options.clogged ?? false,
     idleWorkers: options.idleWorkers ?? 0,
   };
 }
@@ -202,6 +204,30 @@ describe("evaluateCaptions", () => {
       { id: "starving", text: "Home is starving." },
       { id: "unpowered", text: "Bakery is dark." },
       { id: "idle_default", text: "Workers are idle." },
+    ]);
+  });
+
+  it("evaluates thirsty and clogged captions", () => {
+    const rules: CaptionRule[] = [
+      {
+        id: "thirsty",
+        when: { type: "node_flag", nodeId: "bakery", flag: "thirsty" },
+        text: "Bakery is thirsty.",
+      },
+      {
+        id: "clogged",
+        when: { type: "any_home_clogged" },
+        text: "Homes are clogged.",
+      },
+    ];
+    const snap = snapshot([
+      node("bakery", { kind: "bakery", thirsty: true }),
+      node("home", { kind: "home", clogged: true }),
+    ]);
+
+    expect(evaluateCaptions(snap, rules, new Set())).toEqual([
+      { id: "thirsty", text: "Bakery is thirsty." },
+      { id: "clogged", text: "Homes are clogged." },
     ]);
   });
 });
