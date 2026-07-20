@@ -43,10 +43,11 @@ export type CaptionPredicate =
   | {
       type: "node_flag";
       nodeId: string;
-      flag: "starving" | "unpowered" | "idle_workers";
+      flag: "starving" | "unpowered" | "idle_workers" | "thirsty" | "clogged";
       minIdle?: number;
     }
   | { type: "any_home_starving" }
+  | { type: "any_home_clogged" }
   | { type: "node_unpowered"; nodeId: string }
   | { type: "demolished"; id: string };
 
@@ -67,11 +68,18 @@ const captionPredicateSchema: z.ZodType<CaptionPredicate> = z.discriminatedUnion
       .object({
         type: z.literal("node_flag"),
         nodeId: z.string().min(1),
-        flag: z.enum(["starving", "unpowered", "idle_workers"]),
+        flag: z.enum([
+          "starving",
+          "unpowered",
+          "idle_workers",
+          "thirsty",
+          "clogged",
+        ]),
         minIdle: z.number().int().nonnegative().optional(),
       })
       .strict(),
     z.object({ type: z.literal("any_home_starving") }).strict(),
+    z.object({ type: z.literal("any_home_clogged") }).strict(),
     z
       .object({
         type: z.literal("node_unpowered"),
@@ -243,6 +251,10 @@ function matchesPredicate(
       return snapshot.nodes.some(
         (node) => node.kind === "home" && node.starving,
       );
+    case "any_home_clogged":
+      return snapshot.nodes.some(
+        (node) => node.kind === "home" && node.clogged,
+      );
     case "node_unpowered": {
       const node = findNode(snapshot, predicate.nodeId);
       return node ? !node.powered : false;
@@ -263,6 +275,10 @@ function matchesNodeFlag(
       return !node.powered;
     case "idle_workers":
       return node.idleWorkers >= (predicate.minIdle ?? 1);
+    case "thirsty":
+      return node.thirsty;
+    case "clogged":
+      return node.clogged;
   }
 }
 

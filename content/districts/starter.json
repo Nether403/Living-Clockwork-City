@@ -8,8 +8,20 @@
       "name": "Wheat Farm",
       "x": -8,
       "z": 2,
-      "capacity": { "food": 12, "energy": 0, "labor": 0 },
-      "stock": { "food": 6, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 12,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 6,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "bakery_a",
@@ -17,8 +29,20 @@
       "name": "River Bakery",
       "x": -4,
       "z": 1,
-      "capacity": { "food": 8, "energy": 0, "labor": 0 },
-      "stock": { "food": 3, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 8,
+        "energy": 0,
+        "labor": 0,
+        "water": 10,
+        "waste": 0
+      },
+      "stock": {
+        "food": 3,
+        "energy": 0,
+        "labor": 0,
+        "water": 6,
+        "waste": 0
+      }
     },
     {
       "id": "market_a",
@@ -26,8 +50,20 @@
       "name": "Clock Market",
       "x": -1,
       "z": 0,
-      "capacity": { "food": 8, "energy": 0, "labor": 0 },
-      "stock": { "food": 3, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 8,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 3,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "home_west",
@@ -35,8 +71,20 @@
       "name": "West Row Homes",
       "x": -1,
       "z": -3,
-      "capacity": { "food": 8, "energy": 0, "labor": 0 },
-      "stock": { "food": 5, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 8,
+        "energy": 0,
+        "labor": 0,
+        "water": 6,
+        "waste": 6
+      },
+      "stock": {
+        "food": 5,
+        "energy": 0,
+        "labor": 0,
+        "water": 3,
+        "waste": 0
+      }
     },
     {
       "id": "home_east",
@@ -44,8 +92,20 @@
       "name": "East Bank Homes",
       "x": 6,
       "z": -2,
-      "capacity": { "food": 16, "energy": 0, "labor": 6 },
-      "stock": { "food": 12, "energy": 0, "labor": 3 }
+      "capacity": {
+        "food": 16,
+        "energy": 0,
+        "labor": 6,
+        "water": 0,
+        "waste": 8
+      },
+      "stock": {
+        "food": 12,
+        "energy": 0,
+        "labor": 3,
+        "water": 0,
+        "waste": 1
+      }
     },
     {
       "id": "work_west",
@@ -53,8 +113,20 @@
       "name": "West Foundry",
       "x": 1,
       "z": 3,
-      "capacity": { "food": 0, "energy": 0, "labor": 16 },
-      "stock": { "food": 0, "energy": 0, "labor": 3 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 16,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 3,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "work_east",
@@ -62,8 +134,20 @@
       "name": "East Workshop",
       "x": 10,
       "z": 4,
-      "capacity": { "food": 0, "energy": 0, "labor": 16 },
-      "stock": { "food": 0, "energy": 0, "labor": 12 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 16,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 12,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "plant_a",
@@ -71,8 +155,20 @@
       "name": "Steam Plant",
       "x": -6,
       "z": 5,
-      "capacity": { "food": 0, "energy": 20, "labor": 0 },
-      "stock": { "food": 0, "energy": 20, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 20,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 20,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "sub_a",
@@ -80,8 +176,20 @@
       "name": "West Substation",
       "x": -3,
       "z": 4,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "sub_b",
@@ -89,8 +197,20 @@
       "name": "East Substation",
       "x": 7,
       "z": 3,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "j_west_bridge",
@@ -98,8 +218,20 @@
       "name": "West Bridge Junction",
       "x": 2,
       "z": 0,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "j_east_bridge",
@@ -107,8 +239,20 @@
       "name": "East Bridge Junction",
       "x": 5,
       "z": 0,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "j_east_industry",
@@ -116,8 +260,20 @@
       "name": "East Industry Road",
       "x": 7,
       "z": 1,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     },
     {
       "id": "j_east_loop",
@@ -125,8 +281,62 @@
       "name": "East Loop",
       "x": 9,
       "z": 2,
-      "capacity": { "food": 0, "energy": 0, "labor": 0 },
-      "stock": { "food": 0, "energy": 0, "labor": 0 }
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
+    },
+    {
+      "id": "reservoir_a",
+      "kind": "reservoir",
+      "name": "West Reservoir",
+      "x": -5.5,
+      "z": -0.5,
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 16,
+        "waste": 0
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 8,
+        "waste": 0
+      }
+    },
+    {
+      "id": "dump_a",
+      "kind": "dump",
+      "name": "East Dump",
+      "x": 8.5,
+      "z": -3.5,
+      "capacity": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 48
+      },
+      "stock": {
+        "food": 0,
+        "energy": 0,
+        "labor": 0,
+        "water": 0,
+        "waste": 0
+      }
     }
   ],
   "edges": [
@@ -281,6 +491,30 @@
       "kind": "power",
       "traversalTicks": 1,
       "capacity": 99
+    },
+    {
+      "id": "pipe_reservoir_bakery",
+      "from": "reservoir_a",
+      "to": "bakery_a",
+      "kind": "pipe",
+      "traversalTicks": 3,
+      "capacity": 2
+    },
+    {
+      "id": "pipe_reservoir_home_west",
+      "from": "reservoir_a",
+      "to": "home_west",
+      "kind": "pipe",
+      "traversalTicks": 3,
+      "capacity": 2
+    },
+    {
+      "id": "road_home_east_dump",
+      "from": "home_east",
+      "to": "dump_a",
+      "kind": "road",
+      "traversalTicks": 2,
+      "capacity": 2
     }
   ]
 }

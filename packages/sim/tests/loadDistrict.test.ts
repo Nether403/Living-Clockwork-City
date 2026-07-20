@@ -45,10 +45,17 @@ describe("loadDistrict", () => {
         "plant_a",
         "sub_a",
         "sub_b",
+        "reservoir_a",
+        "dump_a",
       ]),
     );
     expect(Object.keys(state.edges)).toEqual(
-      expect.arrayContaining(["road_bridge", "road_farm_bakery"]),
+      expect.arrayContaining([
+        "road_bridge",
+        "road_farm_bakery",
+        "pipe_reservoir_bakery",
+        "road_home_east_dump",
+      ]),
     );
 
     expect(state.tick).toBe(0);
@@ -59,8 +66,11 @@ describe("loadDistrict", () => {
       powered: false,
       operational: true,
       starving: false,
+      thirsty: false,
+      clogged: false,
       idleWorkers: 0,
     });
+    expect(state.nodes.bakery_a.stock.water).toBeGreaterThan(0);
   });
 
   it("rejects invalid district json", () => {

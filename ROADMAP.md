@@ -37,7 +37,13 @@ Make the toy *communicative*:
 
 ### Phase 3 — Expanded loops
 
+**Status:** In progress (slice A: water + waste)
+
 Water, waste, housing capacity, transit congestion. Construction materials appear as visible tokens when building/repairing (feeds Phase 4).
+
+**Slice A (this PR):** Water tokens on pipes; waste tokens to dumps; bakery thirsts without water; homes clog without dump access; two scenarios (`dry_bakery`, `waste_backup`).
+
+**Still open:** Housing capacity, transit congestion, construction materials, pump nodes.
 
 **Done when:** Cascades involve closed loops (e.g. waste backup blocks homes; water cut stops bakery even with food/power).
 

@@ -27,6 +27,8 @@ Phase 1 delivers a **headless discrete-token simulation** plus a **Three.js web 
 | [AGENTS.md](AGENTS.md) | Contributor / agent guidance |
 | [Phase 2 design](docs/superpowers/specs/2026-07-20-phase2-readability-design.md) | Readability & scenarios |
 | [Phase 2 plan](docs/superpowers/plans/2026-07-20-phase2-readability.md) | Task-by-task Phase 2 guide |
+| [Phase 3 design](docs/superpowers/specs/2026-07-20-phase3-expanded-loops-design.md) | Water / waste expanded loops |
+| [Phase 3 plan](docs/superpowers/plans/2026-07-20-phase3-expanded-loops.md) | Slice A implementation guide |
 
 ## Install
 
@@ -86,7 +88,7 @@ npm run preview -w @lcc/web
 
 ## Phase 2 scenarios
 
-The starter district includes five authored Phase 2 “what if” scenarios. Use the **Scenarios** dock to run each one; the city resets cleanly, frames the scene, and auto-demolishes the target where the scenario calls for it.
+The starter district includes authored “what if” scenarios. Use the **Scenarios** dock to run each one; the city resets cleanly, frames the scene, and auto-demolishes the target where the scenario calls for it.
 
 ### 1. Idle Watch — `idle_watch`
 
@@ -108,6 +110,14 @@ Removes `road_bridge`. One residential cluster loses access to workplaces on the
 
 First severs `road_farm_bakery`, then knocks out `plant_a` to compound a food shortage with a power failure.
 
+### 6. Dry Bakery — `dry_bakery` (Phase 3)
+
+Cuts `pipe_reservoir_bakery`. The bakery stays powered and stocked with flour, but thirsts without water — bread stops shipping and homes starve.
+
+### 7. Waste Backup — `waste_backup` (Phase 3)
+
+Cuts `road_home_east_dump`. Waste bins fill at homes; clogged homes stop sending labor and workplaces idle.
+
 ## Repo layout
 
 ```
@@ -123,4 +133,4 @@ Root scripts delegate to workspaces: `npm test` → `@lcc/sim`, `npm run dev` �
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for phase status and [AGENTS.md](AGENTS.md) for contributor / agent guidance. **Phase 2 (readability & scenarios) is complete.** Finish lines: demo after Phase 2, game after Phase 4, crafted product after Phase 5.
+See [ROADMAP.md](ROADMAP.md) for phase status and [AGENTS.md](AGENTS.md) for contributor / agent guidance. **Phase 3 (expanded loops) is in progress** — slice A adds water + waste closed loops. Finish lines: demo after Phase 2, game after Phase 4, crafted product after Phase 5.

@@ -37,15 +37,26 @@ export class Simulation {
           capacity: stock(10, 0, 0),
           stock: stock(5, 0, 0),
         }),
-        bakery: node("bakery", "bakery", { capacity: stock(10, 0, 0) }),
+        bakery: node("bakery", "bakery", {
+          capacity: stock(10, 0, 0, 10),
+          stock: stock(0, 0, 0, 6),
+        }),
         market: node("market", "market", { capacity: stock(10, 0, 0) }),
         home: node("home", "home", {
-          capacity: stock(10, 0, 10),
-          stock: stock(2, 0, 1),
+          capacity: stock(10, 0, 10, 0, 8),
+          stock: stock(2, 0, 1, 0, 0),
         }),
         workplace: node("workplace", "workplace", {
           capacity: stock(0, 0, 10),
           stock: stock(0, 0, 0),
+        }),
+        reservoir: node("reservoir", "reservoir", {
+          capacity: stock(0, 0, 0, 12),
+          stock: stock(0, 0, 0, 6),
+        }),
+        dump: node("dump", "dump", {
+          capacity: stock(0, 0, 0, 0, 40),
+          stock: stock(),
         }),
       },
       edges: {
@@ -90,6 +101,15 @@ export class Simulation {
           "home",
           "workplace",
           "road",
+          2,
+          2,
+        ),
+        road_home_dump: edge("road_home_dump", "home", "dump", "road", 2, 2),
+        pipe_reservoir_bakery: edge(
+          "pipe_reservoir_bakery",
+          "reservoir",
+          "bakery",
+          "pipe",
           2,
           2,
         ),
@@ -236,15 +256,15 @@ function record(
   };
 }
 
-function stock(food = 0, energy = 0, labor = 0): StockPile {
-  return { food, energy, labor };
+function stock(food = 0, energy = 0, labor = 0, water = 0, waste = 0): StockPile {
+  return { food, energy, labor, water, waste };
 }
 
 function node(
   id: string,
   kind: NodeKind,
   options: Partial<
-    Pick<SimNode, "capacity" | "stock" | "powered" | "starving">
+    Pick<SimNode, "capacity" | "stock" | "powered" | "starving" | "thirsty" | "clogged">
   > = {},
 ): SimNode {
   return {
@@ -258,6 +278,8 @@ function node(
     powered: options.powered ?? false,
     operational: true,
     starving: options.starving ?? false,
+    thirsty: options.thirsty ?? false,
+    clogged: options.clogged ?? false,
     idleWorkers: 0,
   };
 }

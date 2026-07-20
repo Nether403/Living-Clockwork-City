@@ -59,6 +59,8 @@ interface CameraEaseState {
 interface NodeStatus {
   powered: boolean;
   starving: boolean;
+  thirsty: boolean;
+  clogged: boolean;
 }
 
 const NODE_STYLES: Record<NodeKind, NodeStyle> = {
@@ -70,11 +72,14 @@ const NODE_STYLES: Record<NodeKind, NodeStyle> = {
   power_plant: { color: 0x8b7563, footprint: [1.25, 1.05], height: 0.9 },
   substation: { color: 0xa58f5d, footprint: [0.5, 0.5], height: 0.45 },
   junction: { color: 0x807461, footprint: [0.5, 0.5], height: 0.08 },
+  reservoir: { color: 0x4f7f92, footprint: [1.1, 1.1], height: 0.35 },
+  dump: { color: 0x6a5b4a, footprint: [1.05, 0.9], height: 0.4 },
 };
 
 const EDGE_DIMENSIONS: Record<EdgeKind, { color: number; height: number; width: number; y: number }> = {
   road: { color: 0x3e352d, height: 0.07, width: 0.28, y: 0.035 },
   power: { color: 0xf0c960, height: 0.035, width: 0.075, y: 0.13 },
+  pipe: { color: 0x5b8ea3, height: 0.045, width: 0.1, y: 0.08 },
 };
 
 const TOKEN_Y = 0.42;
@@ -304,6 +309,12 @@ export class CityScene {
       case "junction":
         this.addJunction(group, node);
         break;
+      case "reservoir":
+        this.addReservoir(group, node);
+        break;
+      case "dump":
+        this.addDump(group, node);
+        break;
       default:
         this.addBlock(group, node, NODE_STYLES[node.kind].color);
         break;
@@ -380,6 +391,28 @@ export class CityScene {
     group.add(mesh);
   }
 
+  private addReservoir(group: Group, node: SimNode): void {
+    this.addBlock(group, node, NODE_STYLES.reservoir.color);
+    const rim = new Mesh(
+      new CylinderGeometry(0.55, 0.55, 0.08, 20),
+      createMaterial(0x6fa4b4),
+    );
+    rim.position.y = NODE_STYLES.reservoir.height + 0.04;
+    rim.castShadow = true;
+    group.add(rim);
+  }
+
+  private addDump(group: Group, node: SimNode): void {
+    this.addBlock(group, node, NODE_STYLES.dump.color);
+    const heap = new Mesh(
+      new BoxGeometry(0.55, 0.22, 0.4),
+      createMaterial(0x85725c),
+    );
+    heap.position.set(0.12, NODE_STYLES.dump.height + 0.12, 0.05);
+    heap.castShadow = true;
+    group.add(heap);
+  }
+
   private updateNodePower(object: Object3D, powered: boolean): void {
     const multiplier = powered ? 1 : UNPOWERED_MULTIPLIER;
     object.traverse((child) => {
@@ -436,6 +469,12 @@ export class CityScene {
         break;
       case "labor":
         group.add(createLaborToken());
+        break;
+      case "water":
+        group.add(createWaterToken());
+        break;
+      case "waste":
+        group.add(createWasteToken());
         break;
     }
 
@@ -513,13 +552,17 @@ export class CityScene {
         shouldCompare &&
         previous &&
         ((!previous.starving && node.starving) ||
-          (previous.powered && !node.powered))
+          (previous.powered && !node.powered) ||
+          (!previous.thirsty && node.thirsty) ||
+          (!previous.clogged && node.clogged))
       ) {
         this.nodePulseUntilMs.set(node.id, now + CASCADE_PULSE_DURATION_MS);
       }
       nextStatuses.set(node.id, {
         powered: node.powered,
         starving: node.starving,
+        thirsty: node.thirsty,
+        clogged: node.clogged,
       });
     }
 
@@ -671,6 +714,26 @@ function createLaborToken(): Object3D {
   return group;
 }
 
+function createWaterToken(): Object3D {
+  const mesh = new Mesh(
+    new CylinderGeometry(0.14, 0.16, 0.28, 14),
+    createMaterial(0x5ea0b8),
+  );
+  mesh.position.y = 0.16;
+  mesh.castShadow = true;
+  return mesh;
+}
+
+function createWasteToken(): Object3D {
+  const mesh = new Mesh(
+    new BoxGeometry(0.26, 0.22, 0.26),
+    createMaterial(0x6e5a48),
+  );
+  mesh.position.y = 0.12;
+  mesh.castShadow = true;
+  return mesh;
+}
+
 function createMaterial(color: number): MeshStandardMaterial {
   const material = new MeshStandardMaterial({
     color,
@@ -727,6 +790,8 @@ function tokenPadOffset(token: Token): Vector3 {
     food: 0.38,
     energy: 0.46,
     labor: 0.54,
+    water: 0.42,
+    waste: 0.5,
   };
   const radius = radiusByResource[token.resource] + ((hash >> 4) % 3) * 0.045;
   return new Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);

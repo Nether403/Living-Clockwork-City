@@ -57,7 +57,7 @@ See [ROADMAP.md](ROADMAP.md). Implement the **in progress** phase only unless th
 | Phase | Ship cue |
 |-------|----------|
 | 1 ✅ | Demolish demo with 3 stories |
-| 2 | Scenario menu + readable cascades |
-| 3 | Water / waste / housing / congestion |
+| 2 ✅ | Scenario menu + readable cascades |
+| 3 🔄 | Water / waste / housing / congestion |
 | 4 | Limited builder = “game finished” |
 | 5 | Multi-district craft = “product finished” |

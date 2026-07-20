@@ -17,6 +17,8 @@ const expectedScenarioIds = [
   "blackout",
   "bridge_out",
   "double_cut",
+  "dry_bakery",
+  "waste_backup",
 ] as const;
 
 function readJson(filename: string): unknown {
@@ -100,6 +102,36 @@ describe("scenario content", () => {
         expect.objectContaining({ when: { type: "any_home_starving" } }),
         expect.objectContaining({
           when: { type: "node_unpowered", nodeId: "bakery_a" },
+        }),
+      ]),
+    );
+
+    expect(scenarios.dry_bakery.autoDemolishId).toBe("pipe_reservoir_bakery");
+    expect(scenarios.dry_bakery.captions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          when: {
+            type: "node_flag",
+            nodeId: "bakery_a",
+            flag: "thirsty",
+          },
+        }),
+        expect.objectContaining({ when: { type: "any_home_starving" } }),
+      ]),
+    );
+
+    expect(scenarios.waste_backup.autoDemolishId).toBe("road_home_east_dump");
+    expect(scenarios.waste_backup.followUp).toBeUndefined();
+    expect(scenarios.waste_backup.captions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ when: { type: "any_home_clogged" } }),
+        expect.objectContaining({
+          when: {
+            type: "node_flag",
+            nodeId: "work_east",
+            flag: "idle_workers",
+            minIdle: 1,
+          },
         }),
       ]),
     );

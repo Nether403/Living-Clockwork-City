@@ -1,0 +1,36 @@
+{
+  "id": "dry_bakery",
+  "title": "Dry Bakery",
+  "blurb": "Cut the bakery pipe — shelves stay full, ovens go dry.",
+  "districtId": "starter",
+  "camera": {
+    "x": -2,
+    "y": 11,
+    "z": 10,
+    "targetX": -4,
+    "targetZ": 0
+  },
+  "warmUpTicks": 12,
+  "autoDemolishId": "pipe_reservoir_bakery",
+  "captions": [
+    {
+      "id": "pipe_cut",
+      "when": { "type": "demolished", "id": "pipe_reservoir_bakery" },
+      "text": "The bakery pipe is gone — water tanks no longer roll west."
+    },
+    {
+      "id": "bakery_thirsty",
+      "when": {
+        "type": "node_flag",
+        "nodeId": "bakery_a",
+        "flag": "thirsty"
+      },
+      "text": "River Bakery thirsts: powered and stocked with flour, but no water to bake."
+    },
+    {
+      "id": "homes_starve",
+      "when": { "type": "any_home_starving" },
+      "text": "Homes go hungry once the dry bakery stops shipping bread."
+    }
+  ]
+}
