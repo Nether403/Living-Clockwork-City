@@ -1,8 +1,9 @@
-import type { Simulation } from "@lcc/sim";
-import type { FrameSnapshot } from "@lcc/sim";
+import type { FrameSnapshot, ScenarioDef, Simulation } from "@lcc/sim";
 import { Picker, type PickSelection } from "./input/Picker";
 import { CityScene } from "./scene/CityScene";
+import { CaptionBanner } from "./ui/CaptionBanner";
 import { InspectPanel } from "./ui/InspectPanel";
+import { ScenarioMenu } from "./ui/ScenarioMenu";
 
 const TICK_MS = 250;
 const MAX_FRAME_DT_MS = 1_000;
@@ -12,6 +13,8 @@ type SpeedMultiplier = (typeof SPEEDS)[number];
 export class GameApp {
   private readonly cityScene: CityScene;
   private readonly inspectPanel: InspectPanel;
+  private readonly scenarioMenu: ScenarioMenu;
+  private readonly captionBanner: CaptionBanner;
   private readonly picker: Picker;
   private frameId: number | null = null;
   private lastFrameTime = 0;
@@ -24,12 +27,19 @@ export class GameApp {
   constructor(
     container: HTMLElement,
     private readonly simulation: Simulation,
+    scenarios: ScenarioDef[],
   ) {
     this.cityScene = new CityScene(container);
     this.inspectPanel = new InspectPanel({
       container,
       onDemolish: this.demolishSelection,
       onRestore: this.restoreSelection,
+    });
+    this.captionBanner = new CaptionBanner(container);
+    this.scenarioMenu = new ScenarioMenu({
+      container,
+      scenarios,
+      onRun: this.runScenario,
     });
     this.picker = new Picker({
       camera: this.cityScene.pickCamera,
@@ -55,6 +65,8 @@ export class GameApp {
     }
     window.removeEventListener("keydown", this.onKeyDown);
     this.picker.dispose();
+    this.scenarioMenu.dispose();
+    this.captionBanner.dispose();
     this.inspectPanel.dispose();
     this.cityScene.dispose();
   }
@@ -99,6 +111,16 @@ export class GameApp {
   private readonly demolishSelection = (id: string): void => {
     this.accumulatorMs = 0;
     this.syncSnapshot(this.simulation.demolish(id));
+  };
+
+  readonly runScenario = (scenarioId: string): void => {
+    this.accumulatorMs = 0;
+    this.selected = null;
+    this.captionBanner.clear();
+    this.scenarioMenu.setActive(scenarioId);
+    this.cityScene.setSelection(null);
+    this.inspectPanel.render(this.snapshot, null);
+    console.log(`Scenario run requested: ${scenarioId}`);
   };
 
   private readonly restoreSelection = (id: string): void => {
