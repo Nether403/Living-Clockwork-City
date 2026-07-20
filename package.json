@@ -1,0 +1,10 @@
+{
+  "name": "living-clockwork-city",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "test": "npm run test -w @lcc/sim",
+    "dev": "npm run dev -w @lcc/web",
+    "build": "npm run build -w @lcc/sim && npm run build -w @lcc/web"
+  }
+}
