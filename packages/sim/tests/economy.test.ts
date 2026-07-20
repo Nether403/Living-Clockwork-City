@@ -205,13 +205,13 @@ describe("economy chain", () => {
     const state = buildMiniChain();
     updatePowerFlags(state);
     state.nodes.bakery.stock.food = 10;
-    state.nodes.bakery.stock.water = 1;
+    state.nodes.bakery.stock.water = 0;
     delete state.edges.pipe_reservoir_bakery;
 
     tickEconomy(state, 12);
 
     expect(state.nodes.bakery.powered).toBe(true);
-    expect(state.nodes.bakery.stock.food).toBeGreaterThan(0);
+    expect(state.nodes.bakery.stock.food).toBeGreaterThanOrEqual(10);
     expect(state.nodes.bakery.thirsty).toBe(true);
     expect(
       Object.values(state.tokens).some(

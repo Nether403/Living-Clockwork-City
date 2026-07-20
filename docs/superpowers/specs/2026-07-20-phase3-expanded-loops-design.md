@@ -99,10 +99,10 @@ Keep existing Phase 1/2 demolish stories intact (farm road, bridge, plant).
 
 ## 8. Acceptance checklist (slice A)
 
-- [ ] Water tokens move reservoir → bakery on pipes
-- [ ] Cutting bakery pipe stops bakery food dispatch while powered + stocked with food
-- [ ] Waste tokens move homes → dump; cutting dump access clogs homes and stops labor
-- [ ] Two new scenarios load and fire captions (tested in sim)
-- [ ] Web renders pipes + water/waste tokens + reservoir/dump
-- [ ] `npm test` and `npm run build` green
-- [ ] ROADMAP marks Phase 3 in progress; deferred items listed
+- [x] Water tokens move reservoir → bakery on pipes
+- [x] Cutting bakery pipe stops bakery food dispatch while powered + stocked with food
+- [x] Waste tokens move homes → dump; cutting dump access clogs homes and stops labor
+- [x] Two new scenarios load and fire captions (tested in sim)
+- [x] Web renders pipes + water/waste tokens + reservoir/dump
+- [x] `npm test` and `npm run build` green
+- [x] ROADMAP marks Phase 3 in progress; deferred items listed
