@@ -41,4 +41,28 @@ describe("Simulation.demolish", () => {
     );
     expect(snap.demolishedIds).toContain("road_farm_bakery");
   });
+
+  it("includes demolished payload details in snapshots", () => {
+    const sim = Simulation.fromMiniChain();
+    const snap = sim.demolish("plant");
+
+    expect(snap.demolished).toEqual(
+      expect.arrayContaining([
+        {
+          id: "plant",
+          kind: "node",
+          batchId: "plant",
+          name: "plant",
+          payloadKind: "power_plant",
+        },
+        {
+          id: "power_sub",
+          kind: "edge",
+          batchId: "plant",
+          name: "power_sub",
+          payloadKind: "power",
+        },
+      ]),
+    );
+  });
 });

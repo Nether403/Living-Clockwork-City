@@ -64,6 +64,14 @@ export interface DemolishedRecord {
   payload: SimNode | SimEdge;
 }
 
+export interface DemolishedSnapshotRecord {
+  id: string;
+  kind: "node" | "edge";
+  batchId: string;
+  name: string;
+  payloadKind: NodeKind | EdgeKind;
+}
+
 export interface SimState {
   tick: number;
   nodes: Record<string, SimNode>;
@@ -79,4 +87,5 @@ export interface FrameSnapshot {
   edges: SimEdge[];
   tokens: Token[];
   demolishedIds: string[];
+  demolished: DemolishedSnapshotRecord[];
 }

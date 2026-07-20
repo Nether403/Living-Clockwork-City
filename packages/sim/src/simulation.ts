@@ -11,6 +11,7 @@ import {
 } from "./tokens.js";
 import type {
   DemolishedRecord,
+  DemolishedSnapshotRecord,
   EdgeKind,
   FrameSnapshot,
   NodeKind,
@@ -160,6 +161,7 @@ export class Simulation {
           this.state.demolished.map((record) => record.batchId ?? record.id),
         ),
       ],
+      demolished: this.state.demolished.map(toDemolishedSnapshotRecord),
     };
   }
 
@@ -194,6 +196,21 @@ export class Simulation {
     strandTokensOnEdge(this.state, edgeToDemolish.id);
     this.state.demolished.push(record("edge", edgeToDemolish, batchId));
   }
+}
+
+function toDemolishedSnapshotRecord(
+  record: DemolishedRecord,
+): DemolishedSnapshotRecord {
+  const batchId = record.batchId ?? record.id;
+  const payload = record.payload;
+
+  return {
+    id: record.id,
+    kind: record.kind,
+    batchId,
+    name: "name" in payload ? payload.name : payload.id,
+    payloadKind: payload.kind,
+  };
 }
 
 function record(
